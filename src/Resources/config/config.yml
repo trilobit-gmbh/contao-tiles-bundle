@@ -1,0 +1,322 @@
+trilobit:
+    tiles:
+        options:
+            webAppManifest:
+                display:
+                    fullscreen:
+                    standalone:
+                    minimal-ui:
+                    browser:
+
+                orientation:
+                    any:
+                    natural:
+                    landscape:
+                    landscape-primary:
+                    landscape-secondary:
+                    portrait:
+                    portrait-primary:
+                    portrait-secondary:
+
+            ios:
+                statusBar:
+                    default:
+                    black:
+                    black-translucent:
+
+        images:
+            apple:
+                tag: 'link'
+                attributes:
+                    rel: 'apple-touch-icon'
+                    href: '/##target##/##alias####junction####filename##.##extension##'
+                    sizes: '##width##x##height##'
+
+                extension: 'png'
+                filename: 'apple-touch-icon-##width##x##height##'
+                sizes:
+                    - width: 57
+                      height: 57
+                      filename: 'apple-touch-icon'
+                    - width: 57
+                      height: 57
+                    - width: 60
+                      height: 60
+                    - width: 72
+                      height: 72
+                    - width: 76
+                      height: 76
+                    - width: 114
+                      height: 114
+                    - width: 120
+                      height: 120
+                    - width: 144
+                      height: 144
+                    - width: 152
+                      height: 152
+                    - width: 180
+                      height: 180
+
+            android:
+                tag: link
+                attributes:
+                    rel: icon
+                    type: image/png
+                    href: '/##target##/##filename##.##extension##'
+                    sizes: '##width##x##height##'
+
+                extension: 'png'
+                filename: 'android-chrome-##width##x##height##'
+                sizes:
+                    - width: 36
+                      height: 36
+                    - width: 48
+                      height: 48
+                    - width: 72
+                      height: 72
+                    - width: 96
+                      height: 96
+                    - width: 144
+                      height: 144
+                    - width: 192
+                      height: 192
+                    - width: 192
+                      height: 192
+                      filename: 'homescreen-192x192'
+
+            microsoft:
+                doku: 'https://msdn.microsoft.com/de-de/library/dn455115(v=vs.85).aspx'
+                tag: meta
+                attributes:
+                    content: '/##target##/##filename##.##extension##'
+                    name: '##name##'
+
+                extension: 'png'
+                filename: 'mstile-##width##x##height##'
+                sizes:
+                    - width: 128
+                      height: 128
+                      name: 'msapplication-square70x70logo'
+                      filename: 'smalltile'
+                    - width: 270
+                      height: 270
+                      name: 'msapplication-square150x150logo'
+                      filename: 'mediumtile'
+                    - width: 558
+                      height: 270
+                      name: 'msapplication-wide310x150logo'
+                      filename: 'widetile'
+                    - width: 558
+                      height: 558
+                      name: 'msapplication-square310x310logo'
+                      filename: 'largetile'
+
+#            firefox:
+#                tag: meta
+#                attributes:
+#                    content: '/##target##/##filename##.##extension##'
+#                    name: '##name##'
+#
+#                extension: png
+#                filename: firefox-icon-##width##x##height##
+#                sizes:
+#                    - width: 16
+#                      height: 16
+#                   - width: 30
+#                    height: 30
+#                    - width: 32
+#                      height: 32
+#                    - width: 48
+#                      height: 48
+#                    - width: 60
+#                      height: 60
+#                    - width: 64
+#                      height: 64
+#                    - width: 90
+#                      height: 90
+#                    - width: 120
+#                      height: 128
+#                    - width: 128
+#                      height: 128
+#                    - width: 256
+#                      height: 256
+#
+            icon:
+                tag: 'link'
+                attributes:
+                    rel: 'icon'
+                    type: 'image/png'
+                    href: '/##target##/##filename##.##extension##'
+                    sizes: '##width##x##height##'
+
+                extension: 'png'
+                filename: 'favicon-##width##x##height##'
+                sizes:
+                    - width: 16
+                      height: 16
+                    - width: 32
+                      height: 32
+                    - width: 96
+                      height: 96
+                    - width: 128
+                      height: 128
+                    - width: 160
+                      height: 160
+                    - width: 192
+                      height: 192
+                    - width: 196
+                      height: 196
+
+        additionals:
+            windows:
+                windowsTitle:
+                    tag: 'meta'
+                    attributes:
+                        name: 'application-name'
+                        content: '##windowsTitle##'
+
+                windowsTooltip:
+                    tag: 'meta'
+                    attributes:
+                        name: 'msapplication-tooltip'
+                        content: '##windowsTooltip##'
+
+                windowsDns:
+                    tag: 'meta'
+                    attributes:
+                        name: 'msapplication-starturl'
+                        content: '##windowsDns##'
+
+                windowsTileColor:
+                    tag: 'meta'
+                    attributes:
+                        name: 'msapplication-TileColor'
+                        content: '###windowsTileColor##'
+
+                windowsTooltipColor:
+                    tag: 'meta'
+                    attributes:
+                        name: 'msapplication-navbutton-color'
+                        content: '###windowsTooltipColor##'
+
+                windowsSize:
+                    tag: 'meta'
+                    attributes:
+                        name: 'msapplication-window'
+                        content: '##windowsSize##'
+
+                windowsRss:
+                    tag: 'meta'
+                    attributes:
+                        name: 'msapplication-window'
+                        content: 'frequency=##windowsRssFrequency##; polling-uri=##windowsRss##'
+
+            ios:
+                iosApp:
+                    tag: 'meta'
+                    attributes:
+                        name: 'apple-mobile-web-app-capable'
+                        content: 'yes'
+
+                iosTitle:
+                    tag: 'meta'
+                    attributes:
+                        name: 'apple-mobile-web-app-title'
+                        content: '##iosTitle##'
+
+                iosStatusBarStyle:
+                    tag: 'meta'
+                    attributes:
+                        name: 'apple-mobile-web-app-status-bar-style'
+                        content: '##iosStatusBarStyle##'
+
+            android:
+                androidApp:
+                    tag: 'meta'
+                    attributes:
+                        name: 'mobile-web-app-capable'
+                        content: 'yes'
+
+            webApp:
+                manifest:
+                    tag: 'link'
+                    attributes:
+                        rel: 'manifest'
+                        href: '/##target##/##alias##.json'
+
+                webappName:
+                    tag: 'meta'
+                    attributes:
+                        name: 'name'
+                        content: '##webappName##'
+
+                webappShortName:
+                    tag: 'meta'
+                    attributes:
+                        name: 'short_name'
+                        content: '##webappShortName##'
+
+                webappDescription:
+                    tag: 'meta'
+                    attributes:
+                        name: 'description'
+                        content: '##webappDescription##'
+
+                webappDisplay:
+                    tag: 'meta'
+                    attributes:
+                        name: 'display'
+                        content: '##webappDisplay##'
+
+                webappOrientation:
+                    tag: 'meta'
+                    attributes:
+                        name: 'orientation'
+                        content: '##webappOrientation##'
+
+                webappThemeColor:
+                    tag: 'meta'
+                    attributes:
+                        name: 'theme_color'
+                        content: '###webappThemeColor##'
+
+                webappBackgroundColor:
+                    tag: 'meta'
+                    attributes:
+                        name: 'background_color'
+                        content: '###webappBackgroundColor##'
+
+#        webApp:
+#            extension: 'json'
+#            filename: 'wepapp-##alias##'
+#            options:
+#                webappName:
+#                    name: 'name'
+#                    content: '##webappName##'
+#
+#                webappShortName:
+#                    name: 'short_name'
+#                    content: '##webappShortName##'
+#
+#                webappDescription:
+#                    name: 'description'
+#                    content: '##webappDescription##'
+#
+#                webappDisplay:
+#                    name: 'display'
+#                    content: '##webappDisplay##'
+#
+#                webappOrientation:
+#                    name: 'orientation'
+#                    content: '##webappOrientation##'
+#
+#                webappThemeColor:
+#                    name: 'theme_color'
+#                    content: '###webappThemeColor##'
+#
+#                webappBackgroundColor:
+#                    name: 'background_color'
+#                    content: '###webappBackgroundColor##'
+
+        system:
+            junction: '_'

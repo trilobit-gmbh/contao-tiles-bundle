@@ -1,0 +1,48 @@
+/**
+ * @file backend.css
+ * trilobit css files
+ *
+ * @author      Peter Adelmann
+ * @company     trilobit GmbH
+ * @team        Apache
+ * @email       peter.adelmann@trilobit.de
+ * @url         http://www.trilobit.de
+ *
+ * @version     2016-12-20_0815
+ *
+ * __update__: 201x-xx-xx / xx:xx:xx
+ */
+
+#tiles_images .preview {
+    height: 375px;
+    width: calc(25% - 38px);
+    float: left;
+
+    border: 1px solid lightgray;
+    margin-bottom: 30px;
+}
+
+#tiles_images .preview .tl_show {
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 2%;
+}
+
+#tiles_images .preview .image-container {
+    width: 96%;
+    padding: 2%;
+    height: 247px;
+    display: table;
+}
+
+#tiles_images .preview .image-container span {
+    display: table-cell;
+    height: 100%;
+    vertical-align: middle;
+    text-align: center;
+}
+
+#tiles_images .preview .image-container span img {
+    max-width: 100%;
+    height: auto;
+}

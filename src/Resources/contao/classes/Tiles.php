@@ -1,0 +1,602 @@
+<?php
+
+/**
+ * Contao Open Source CMS
+ *
+ * Copyright (c) 2005-2015 Leo Feyer
+ *
+ * @license LGPL-3.0+
+ */
+
+namespace Trilobit\TilesBundle;
+
+use Contao\Controller;
+use Contao\Database;
+use Contao\FilesModel;
+use Contao\Frontend;
+use Contao\LayoutModel;
+use Contao\PageModel;
+use Contao\PageRegular;
+use Contao\StringUtil;
+
+
+/**
+ * Class Tiles
+ * @package Trilobit\TilesBundle
+ */
+class Tiles extends Frontend
+{
+
+    /**
+     * @param PageModel $objPage
+     * @param LayoutModel $objLayout
+     * @param PageRegular $objPageRegular
+     */
+    public function generatePageHook(PageModel $objPage, LayoutModel $objLayout, PageRegular $objPageRegular)
+    {
+        global $objPage;
+
+        $arrTiles = array();
+        $time = time();
+
+        $strQuery = "(start='' OR start<$time) AND (stop='' OR stop>$time) AND published=1 ";
+
+        $objElements = Database::getInstance()
+            ->prepare("SELECT * FROM tl_tiles WHERE " . $strQuery . "ORDER by sorting ASC")
+            ->execute();
+
+        if ($objElements === null) return;
+    
+        $arrSettings = Helper::getConfigData();
+    
+        while ($objElements->next())
+        {
+            $arrPages  = StringUtil::deserialize($objElements->pages, true);
+
+            $objTarget = FilesModel::findByPk($objElements->target);
+
+            foreach ($arrPages as $intPageId)
+            {
+                $arrData[$intPageId] = self::prepareData($objElements);
+                $arrData[$intPageId]['target'] = $objTarget->path;
+            }
+        }
+
+        if (isset($arrTiles[$objPage->id]))
+        {
+            self::processData($arrData[$objPage->id]);
+        }
+        else
+        {
+            $objParentPages = PageModel::findParentsById($objPage->id);
+            
+            if ($objParentPages !== null)
+            {
+                while ($objParentPages->next())
+                {
+                    if (isset($arrData[$objParentPages->id]))
+                    {
+                        self::processData($arrData[$objParentPages->id]);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+     * @param array $arrData
+     */
+    public function processData($arrData=array())
+    {
+        $arrSettings = Helper::getConfigData();
+
+        self::addImageData($arrData, $arrSettings);
+
+        self::addAdditionalData($arrData, $arrSettings);
+
+        //self::processDataFavicon($arrData, $arrSettings);
+    }
+
+
+    /**
+     * @param array $arrData
+     * @param array $arrSettings
+     */
+    protected function addImageData($arrData=array(), $arrSettings=array())
+    {
+        if (!is_array($arrSettings['images'])) return;
+
+        foreach ($arrSettings['images'] as $key => $value)
+        {
+            self::addToHeader('<!--- images::' . $key . ' --->');
+
+            foreach ($value['sizes'] as $strSizesKey => $arrSizesValue)
+            {
+                $strHeader = '<' . $value['tag'];
+
+                foreach ($value['attributes'] as $aKey => $aValue)
+                {
+                    if ($aValue == '')
+                    {
+                        $strHeader .= ' ' . $aKey;
+                    }
+                    else
+                    {
+                        $strHeader .= ' ' . $aKey . '="' . $aValue . '"';
+                    }
+                }
+
+                if (isset($arrSizesValue['media']))
+                {
+                    $strHeader .= ' media="' . $arrSizesValue['media'] . '"';
+                }
+
+                $strHeader .= '>';
+
+                // update information
+                foreach ($arrData as $dKey => $dValue)
+                {
+                    $strHeader = str_replace('##' . $dKey . '##',   $dValue,   $strHeader);
+                }
+
+                $strHeader = str_replace('##extension##', $value['extension'], $strHeader);
+
+                $strHeader = str_replace('##filename##',  (isset($arrSizesValue['filename']) ? $arrSizesValue['filename'] : $value['filename']), $strHeader);
+                $strHeader = str_replace('##name##',      $arrSizesValue['name'],     $strHeader);
+                $strHeader = str_replace('##width##',     $arrSizesValue['width'],    $strHeader);
+                $strHeader = str_replace('##height##',    $arrSizesValue['height'],   $strHeader);
+
+                // add to header
+                self::addToHeader($strHeader);
+            }
+        }
+    }
+
+
+    /**
+     * @param array $arrData
+     * @param array $arrSettings
+     */
+    protected function addAdditionalData($arrData=array(), $arrSettings=array())
+    {
+        if (!is_array($arrSettings['additionals'])) return;
+
+        foreach ($arrSettings['additionals'] as $key => $value)
+        {
+            self::addToHeader('<!--- additionals::' . $key . ' --->');
+
+            foreach ($value as $strItemKey => $arrItemValue)
+            {
+                if ($arrData[$strItemKey] == '' || $arrData[$strItemKey] === null)
+                {
+                    continue;
+                }
+
+                $strHeader = '<' . $arrItemValue['tag'] . ' ';
+
+                foreach ($arrItemValue['attributes'] as $strAttributeKey => $strAttributeValue)
+                {
+                    $strHeader .= $strAttributeKey . '="' . $strAttributeValue . '" ';
+                }
+
+                $strHeader .= '>';
+
+                foreach ($arrData as $dKey => $dValue)
+                {
+                    $strHeader = str_replace('##' . $dKey . '##', $dValue, $strHeader);
+                }
+
+                self::addToHeader($strHeader);
+            }
+        }
+    }
+
+
+    /**
+     * @param array $arrData
+     * @param array $arrSettings
+     */
+    protected function processDataFavicon($arrData=array(), $arrSettings=array())
+    {
+        if (!is_array($arrSettings['favicon']['integration'])) return;
+
+        foreach ($arrSettings['favicon']['integration'] as $value)
+        {
+            $strHeader = '<' . $arrSettings['favicon']['tag'] . ' ';
+
+            foreach ($value as $strAttributeKey => $strAttributeValue)
+            {
+                $strHeader .= $strAttributeKey . '="' . $strAttributeValue . '" ';
+            }
+
+            foreach ($arrSettings['favicon']['attributes'] as $strAttributeKey => $strAttributeValue)
+            {
+                $strHeader .= $strAttributeKey . '="' . $strAttributeValue . '" ';
+            }
+
+            $strHeader .= '>';
+
+            foreach ($arrData as $dKey => $dValue)
+            {
+                $strHeader = str_replace('##' . $dKey . '##',   $dValue,   $strHeader);
+            }
+
+            $strHeader = str_replace('##extension##', $arrSettings['favicon']['extension'], $strHeader);
+            $strHeader = str_replace('##filename##',  $arrSettings['favicon']['filename'],  $strHeader);
+            $strHeader = str_replace('##name##',      $arrSettings['favicon']['name'],      $strHeader);
+
+            self::addToHeader($strHeader);
+        }
+    }
+
+
+    /**
+     * @param $objData
+     * @return array
+     */
+    protected function prepareData($objData)
+    {
+        $arrWebappThemeColor      = StringUtil::deserialize($objData->webappThemeColor, true);
+        $strWebappThemeColor      = $arrWebappThemeColor[0];
+
+        $arrWebappBackgroundColor = StringUtil::deserialize($objData->webappBackgroundColor, true);
+        $strWebappBackgroundColor = $arrWebappBackgroundColor[0];
+
+        $arrWindowsTileColor      = StringUtil::deserialize($objData->windowsTileColor, true);
+        $strWindowsTileColor      = $arrWindowsTileColor[0];
+
+        $arrWindowsTooltipColor   = StringUtil::deserialize($objData->windowsTooltipColor, true);
+        $strWindowsTooltipColor   = $arrWindowsTooltipColor[0];
+
+        $arrWindowsSize           = StringUtil::deserialize($objData->windowsSize, true);
+
+        $strWindowsRssFrequency   = ($objData->windowsRss !== '' ? ($objData->windowsRssFrequency !== '' ? $objData->windowsRssFrequency : 30) : '');
+        $strWindowsSize           = ($arrWindowsSize[0] !== '' && $arrWindowsSize[1] !== '' ? 'width=' . $arrWindowsSize[0] . ';height=' . $arrWindowsSize[1] : '');
+
+        $arrSettings = Helper::getConfigData();
+
+        $arrWindows = array();
+        $arrWebapp  = array();
+        $arrIos     = array();
+        $arrAndroid = array();
+
+
+        if ($objData->addWindowstiles)
+        {
+            $arrWindows = array
+            (
+                'windowsTitle'        => $objData->windowsTitle,
+                'windowsTooltip'      => $objData->windowsTooltip,
+                'windowsDns'          => $objData->windowsDns,
+                'windowsSize'         => $strWindowsSize,
+                'windowsTileColor'    => $strWindowsTileColor,
+                'windowsTooltipColor' => $strWindowsTooltipColor,
+            );
+
+            if ($objData->addWindowsrss)
+            {
+                $arrWindows = array_merge(
+                    $arrWindows,
+                    array
+                    (
+                        'windowsRss'          => $objData->windowsRss,
+                        'windowsRssFrequency' => $strWindowsRssFrequency,
+                    )
+                );
+            }
+
+        }
+
+        if ($objData->addWebapp)
+        {
+            $arrWebapp = array
+            (
+                'webappName'            => $objData->webappName,
+                'webappShortName'       => $objData->webappShortName,
+                'webappDescription'     => $objData->webappDescription,
+                'webappDisplay'         => $objData->webappDisplay,
+                'webappOrientation'     => $objData->webappOrientation,
+                'webappThemeColor'      => $strWebappThemeColor,
+                'webappBackgroundColor' => $strWebappBackgroundColor,
+            );
+        }
+
+        if ($objData->addIos)
+        {
+            $arrIos = array
+            (
+                'iosStatusBarStyle'     => $objData->iosStatusBarStyle,
+                'iosTitle'              => $objData->iosTitle,
+                'iosApp'                => $objData->iosApp,
+            );
+        }
+
+        if ($objData->addAndroid)
+        {
+            $arrAndroid = array
+            (
+                'androidApp' => $objData->androidApp,
+            );
+        }
+
+        return array_merge(
+            array
+            (
+                'alias'    => $objData->alias,
+                'junction' => $arrSettings['system']['junction'],
+            ),
+            $arrWindows,
+            $arrWebapp,
+            $arrIos,
+            $arrAndroid
+        );
+    }
+
+
+    /**
+     * @param $strData
+     */
+    protected function addToHeader($strData)
+    {
+        $GLOBALS['TL_HEAD'][] = Controller::replaceInsertTags($strData);
+    }
+
+
+    /**
+     * @param string $strPath
+     * @param string $strFilenameA
+     * @param string $strFilenameB
+     * @param string $strExtension
+     * @param string $strAlias
+     * @param string $strJunction
+     * @param string $strWidth
+     * @param string $strHeight
+     * @return mixed|string
+     */
+    protected static function getFilename($strPath='', $strFilenameA='', $strFilenameB='', $strExtension='', $strAlias='', $strJunction='', $strWidth='', $strHeight='')
+    {
+        $strData = $strPath
+            . '/'
+            . (isset($strFilenameB) ? $strFilenameB : $strFilenameA)
+            . '.' . $strExtension
+        ;
+
+        $strData = str_replace('##width##',    $strWidth,    $strData);
+        $strData = str_replace('##height##',   $strHeight,   $strData);
+        $strData = str_replace('##alias##',    $strAlias,    $strData);
+        $strData = str_replace('##junction##', $strJunction, $strData);
+
+        return $strData;
+    }
+
+
+    /**
+     * @param $arrData
+     * @param $strData
+     * @return mixed|string
+     */
+    protected static function getCurrentData($arrData, $strData)
+    {
+        foreach ($arrData as $key => $value)
+        {
+            $strData = str_replace('##' . $key . '##', $value, $strData);
+        }
+
+        $strData = Controller::replaceInsertTags($strData);
+
+        return $strData;
+    }
+
+
+    /**
+     * @param null $objData
+     * @return string|void
+     */
+    public static function previewIcons($objData=null)
+    {
+        $objImage  = FilesModel::findByUuid($objData->singleSRC);
+        $objTarget = FilesModel::findByPk($objData->target);
+    
+        if ($objImage === null || $objTarget === null) return '';
+    
+        $strSourceFile      = $objImage->path;
+        $strDestinationPath = $objTarget->path;
+    
+        $arrSettings = Helper::getConfigData();
+        
+        $strReturn = '';
+
+        if (!is_array($arrSettings['images'])) return;
+
+        foreach ($arrSettings['images'] as $strGroupKey => $value)
+        {
+            $strReturn .= '<div class="clr widget">'
+                . '<h3><label>'
+                . (isset($GLOBALS['TL_LANG']['tl_tiles']['template'][$strGroupKey]) ? $GLOBALS['TL_LANG']['tl_tiles']['template'][$strGroupKey] : '__' . $strGroupKey . '__')
+                . '</label></h3>'
+                . '</div>'
+                ;
+
+            foreach ($value['sizes'] as $strSizesKey => $arrSizesValue)
+            {
+                $strFilename = self::getFilename(
+                    $strDestinationPath, $value['filename'], $arrSizesValue['filename'], $value['extension'],
+                    $objData->alias,
+                    $arrSettings['system']['junction'],
+                    $arrSizesValue['width'], $arrSizesValue['height']
+                );
+
+                $strTitle = self::getFilename(
+                    '', $value['filename'], $arrSizesValue['filename'], $value['extension'],
+                    $objData->alias,
+                    $arrSettings['system']['junction'],
+                    $arrSizesValue['width'], $arrSizesValue['height']
+                );
+
+                if (is_file(TL_ROOT . '/' . $strFilename))
+                {
+                    $strReturn .= '<div class="widget preview">'
+                        . '<div class="image-container">'
+                            . '<span>'
+                                . '<img src="' . $strFilename . '?t=' . time() . '" width="' . $arrSizesValue['width'] . '" height="' . $arrSizesValue['height'] . '">'
+                            . '</span>'
+                        . '</div>'
+
+                        . '<br>'
+
+                        . '<table class="tl_show">'
+                            . '<tbody>'
+                                . '<tr>'
+                                    . '<td class="tl_bg"><span class="tl_label">ID: </span></td>'
+                                    . '<td class="tl_bg">' . substr($strTitle, 1) . '</td>'
+                                . '</tr>'
+                                . '<tr>'
+                                    . '<td class=""><span class="tl_label">width: </span></td>'
+                                    . '<td class="">' . $arrSizesValue['width'] . '</td>'
+                                . '</tr>'
+                                . '<tr>'
+                                    . '<td class="tl_bg"><span class="tl_label">height: </span></td>'
+                                    . '<td class="tl_bg">' . $arrSizesValue['height'] . '</td>'
+                                . '</tr>'
+                            . '</tbody>'
+                        . '</table>'
+
+                        . '</div>'
+                    ;
+                }
+            }
+        }
+        
+        return $strReturn;
+    }
+
+
+    /**
+     * @param null $objData
+     */
+    public function generateTiles($objData=null)
+    {
+        $objImage  = FilesModel::findByUuid($objData->singleSRC);
+        $objTarget = FilesModel::findByPk($objData->target);
+    
+        if ($objImage === null || $objTarget === null) return;
+        
+        $strSourceFile      = TL_ROOT . '/' . $objImage->path;
+        $strDestinationPath = TL_ROOT . '/' . $objTarget->path;
+    
+        $arrSettings = Helper::getConfigData();
+        $arrData     = self::prepareData($objData);
+
+        $arrJson     = array();
+
+        // generate tiles
+        foreach ($arrSettings['images'] as $strGroupKey => $value)
+        {
+            foreach ($value['sizes'] as $strSizesKey => $arrSizesValue)
+            {
+                $strFilename = self::getFilename(
+                    $strDestinationPath, $value['filename'], $arrSizesValue['filename'], $value['extension'],
+                    $objData->alias,
+                    $arrSettings['system']['junction'],
+                    $arrSizesValue['width'], $arrSizesValue['height']
+                );
+                
+                \System::getContainer()
+                    ->get('contao.image.image_factory')
+                    ->create(
+                        $strSourceFile,
+                        array(
+                            $arrSizesValue['width'],
+                            $arrSizesValue['height'],
+                            $objData->crop
+                        ),
+                        $strFilename
+                    )
+                    ->getUrl(TL_ROOT);
+            }
+        }
+
+        // generate webApp options
+        foreach ($arrSettings['webApp']['options'] as $value)
+        {
+            $strName    = $value['name'];
+
+            $arrJson[$strName] = self::getCurrentData($arrData, $value['content']);
+        }
+
+        // generate webApp settings
+        foreach ($arrSettings['webApp'] as $key => $value)
+        {
+            if (is_array($value)) continue;
+
+            $arrSettings['webApp'][$key] = self::getCurrentData($arrData, $value);
+        }
+
+        /*
+        $strFilename = self::getFilename(
+            $strDestinationPath, $arrSettings['webApp']['filename'], $arrSettings['webApp']['filename'], $arrSettings['webApp']['extension'],
+            $arrData['alias'],
+            $arrSettings['system']['junction']
+        );
+
+        $fileHandler = fopen($strFilename, 'w');
+        fwrite($fileHandler, json_encode($arrJson));
+        fclose($fileHandler);
+        */
+
+        // generate favicon
+        /*
+        $strFaviconSourceForIcoFilename = $arrSettings['favicon']['source'];
+        $strFaviconSourceForIcoFilename = str_replace('##target##',   $objTarget->path,         $strFaviconSourceForIcoFilename);
+        $strFaviconSourceForIcoFilename = str_replace('##alias##',    $objData->alias, $strFaviconSourceForIcoFilename);
+        $strFaviconSourceForIcoFilename = str_replace('##junction##', $arrSettings['system']['junction'],       $strFaviconSourceForIcoFilename);
+
+        \Trilobit\Tiles::createIcoFile(
+            TL_ROOT . '/' . $strFaviconSourceForIcoFilename,
+            $objTarget->path . '/' . $objData->alias . $arrSettings['system']['junction'] . $arrSettings['favicon']['filename'] . '.' . $arrSettings['favicon']['extension'],
+            $arrSettings['favicon']['sizes']
+        );
+        */
+
+        Database::getInstance()
+            ->prepare("UPDATE tl_tiles SET forceUpdate=? WHERE id=?")
+            ->limit(1)
+            ->execute('', $objData->id);
+
+        return;
+    }
+
+
+    /**
+     * @param $strSourceFile
+     * @param $strTargetFile
+     * @param $arrFaviconSizes
+     */
+    protected function createIcoFile($strSourceFile, $strTargetFile, $arrFaviconSizes)
+    {
+        require_once self::getVendowDir() . '/vendor/class-php-ico.php';
+
+        $objIconFile = new \PHP_ICO($strSourceFile, $arrFaviconSizes);
+        $objFile = new \File($strTargetFile);
+        $objFile->write($objIconFile->_get_ico_data());
+        $objFile->close();
+    }
+}
+
+/*
+ * Configuring Web Applications
+ * https://developer.apple.com/library/safari/documentation/appleapplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html
+ * Safari Web Content Guide
+ *
+ * Specifying a Startup Image
+ * <link rel="apple-touch-startup-image" href="/startup.png">
+ *
+ * Hiding Safari User Interface Components
+ * <meta name="apple-mobile-web-app-capable" content="yes">
+ *
+ * Changing the Status Bar Appearance
+ * <meta name="apple-mobile-web-app-status-bar-style" content="black">
+ *
+ */
