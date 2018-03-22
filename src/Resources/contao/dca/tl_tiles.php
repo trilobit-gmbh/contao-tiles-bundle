@@ -165,7 +165,7 @@ $GLOBALS['TL_DCA']['tl_tiles'] = array
             'sorting'              => true,
             'flag'                 => 1,
             'inputType'            => 'pageTree',
-            'eval'                 => array('multiple'=>true, 'fieldType'=>'checkbox', 'mandatory'=>true, 'tl_class'=>'clr w50'),
+            'eval'                 => array('multiple'=>true, 'fieldType'=>'checkbox', 'mandatory'=>true),
             'sql'                  => "blob NULL"
         ),
         'target' => array
@@ -176,7 +176,7 @@ $GLOBALS['TL_DCA']['tl_tiles'] = array
             'sorting'              => true,
             'flag'                 => 1,
             'inputType'            => 'fileTree',
-            'eval'                 => array('multiple'=>false, 'fieldType'=>'radio', 'mandatory'=>true, 'tl_class'=>'clr w50'),
+            'eval'                 => array('multiple'=>false, 'fieldType'=>'radio', 'mandatory'=>true),
             'sql'                  => "blob NULL"
         ),
         'singleSRC' => array
@@ -184,7 +184,7 @@ $GLOBALS['TL_DCA']['tl_tiles'] = array
             'label'                => &$GLOBALS['TL_LANG']['tl_content']['singleSRC'],
             'exclude'              => true,
             'inputType'            => 'fileTree',
-            'eval'                 => array('mandatory'=>true, 'filesOnly'=>true, 'fieldType'=>'radio', 'tl_class'=>'clr', 'extensions'=>'jpg,jpeg,png,gif'),
+            'eval'                 => array('mandatory'=>true, 'filesOnly'=>true, 'fieldType'=>'radio', 'extensions'=>'jpg,jpeg,png,gif'),
             'sql'                  => "binary(16) NULL"
         ),
         'forceUpdate' => array
