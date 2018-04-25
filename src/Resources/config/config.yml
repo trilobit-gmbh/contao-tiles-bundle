@@ -29,7 +29,7 @@ trilobit:
                 tag: 'link'
                 attributes:
                     rel: 'apple-touch-icon'
-                    href: '/##target##/##alias####junction####filename##.##extension##'
+                    href: '##target##/##alias####junction####filename##.##extension##'
                     sizes: '##width##x##height##'
 
                 extension: 'png'
@@ -62,7 +62,7 @@ trilobit:
                 attributes:
                     rel: icon
                     type: image/png
-                    href: '/##target##/##filename##.##extension##'
+                    href: '##target##/##filename##.##extension##'
                     sizes: '##width##x##height##'
 
                 extension: 'png'
@@ -88,7 +88,7 @@ trilobit:
                 doku: 'https://msdn.microsoft.com/de-de/library/dn455115(v=vs.85).aspx'
                 tag: meta
                 attributes:
-                    content: '/##target##/##filename##.##extension##'
+                    content: '##target##/##filename##.##extension##'
                     name: '##name##'
 
                 extension: 'png'
@@ -114,7 +114,7 @@ trilobit:
 #            firefox:
 #                tag: meta
 #                attributes:
-#                    content: '/##target##/##filename##.##extension##'
+#                    content: '##target##/##filename##.##extension##'
 #                    name: '##name##'
 #
 #                extension: png
@@ -146,7 +146,7 @@ trilobit:
                 attributes:
                     rel: 'icon'
                     type: 'image/png'
-                    href: '/##target##/##filename##.##extension##'
+                    href: '##target##/##filename##.##extension##'
                     sizes: '##width##x##height##'
 
                 extension: 'png'
@@ -242,7 +242,7 @@ trilobit:
                     tag: 'link'
                     attributes:
                         rel: 'manifest'
-                        href: '/##target##/##alias##.json'
+                        href: '##target##/##alias##.json'
 
                 webappName:
                     tag: 'meta'
