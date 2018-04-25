@@ -100,6 +100,12 @@ $GLOBALS['TL_LANG']['tl_tiles']['addAndroid'][1]            = 'Click here to add
 $GLOBALS['TL_LANG']['tl_tiles']['androidApp'][0]            = 'Full screen';
 $GLOBALS['TL_LANG']['tl_tiles']['androidApp'][1]            = 'Determines whether a web application is displayed in full-screen mode.';
 
+// template
+$GLOBALS['TL_LANG']['tl_tiles']['template']['apple']     = 'Apple touch icons';
+$GLOBALS['TL_LANG']['tl_tiles']['template']['android']   = 'Android';
+$GLOBALS['TL_LANG']['tl_tiles']['template']['microsoft'] = 'Microsoft tiles';
+$GLOBALS['TL_LANG']['tl_tiles']['template']['icon']      = 'Favicon';
+
 // options
 $GLOBALS['TL_LANG']['tl_tiles']['options']['webappDisplay']['fullscreen']              = 'Full screen';
 $GLOBALS['TL_LANG']['tl_tiles']['options']['webappDisplay']['standalone']              = 'Standalone';
@@ -118,6 +124,3 @@ $GLOBALS['TL_LANG']['tl_tiles']['options']['webappOrientation']['portrait-second
 $GLOBALS['TL_LANG']['tl_tiles']['options']['iosStatusBarStyle']['default']             = 'Default';
 $GLOBALS['TL_LANG']['tl_tiles']['options']['iosStatusBarStyle']['black']               = 'Black';
 $GLOBALS['TL_LANG']['tl_tiles']['options']['iosStatusBarStyle']['black-translucent']   = 'Black-translucent';
-
-
-//https://tomitm.github.io/appmanifest/
