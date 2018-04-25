@@ -100,6 +100,12 @@ $GLOBALS['TL_LANG']['tl_tiles']['addAndroid'][1]            = 'Hier klicken um A
 $GLOBALS['TL_LANG']['tl_tiles']['androidApp'][0]            = 'Vollbildmodus';
 $GLOBALS['TL_LANG']['tl_tiles']['androidApp'][1]            = 'Legt fest, ob eine Web-Anwendung im Vollbildmodus angezeigt wird.';
 
+// template
+$GLOBALS['TL_LANG']['tl_tiles']['template']['apple']     = 'Apple touch icons';
+$GLOBALS['TL_LANG']['tl_tiles']['template']['android']   = 'Android';
+$GLOBALS['TL_LANG']['tl_tiles']['template']['microsoft'] = 'Microsoft tiles';
+$GLOBALS['TL_LANG']['tl_tiles']['template']['icon']      = 'Favicon';
+
 // options
 $GLOBALS['TL_LANG']['tl_tiles']['options']['webappDisplay']['fullscreen']              = 'Vollbild';
 $GLOBALS['TL_LANG']['tl_tiles']['options']['webappDisplay']['standalone']              = 'Alleine-stehend';
