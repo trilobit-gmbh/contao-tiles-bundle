@@ -18,6 +18,7 @@ use Contao\LayoutModel;
 use Contao\PageModel;
 use Contao\PageRegular;
 use Contao\StringUtil;
+use Contao\Environment;
 
 
 /**
@@ -47,8 +48,11 @@ class Tiles extends Frontend
 
         if ($objElements === null) return;
     
-        $arrSettings = Helper::getConfigData();
-    
+        //$arrSettings = Helper::getConfigData();
+        $arrData = array();
+
+        $static = (TL_FILES_URL !== '' ? TL_FILES_URL : Environment::get('url') . '/');
+
         while ($objElements->next())
         {
             $arrPages  = StringUtil::deserialize($objElements->pages, true);
@@ -58,7 +62,7 @@ class Tiles extends Frontend
             foreach ($arrPages as $intPageId)
             {
                 $arrData[$intPageId] = self::prepareData($objElements);
-                $arrData[$intPageId]['target'] = $objTarget->path;
+                $arrData[$intPageId]['target'] = $static . $objTarget->path;
             }
         }
 
@@ -143,10 +147,12 @@ class Tiles extends Frontend
 
                 $strHeader = str_replace('##extension##', $value['extension'], $strHeader);
 
-                $strHeader = str_replace('##filename##',  (isset($arrSizesValue['filename']) ? $arrSizesValue['filename'] : $value['filename']), $strHeader);
+                $strHeader = str_replace('##filename##',  isset($arrSizesValue['filename']) ? $arrSizesValue['filename'] : $value['filename'], $strHeader);
                 $strHeader = str_replace('##name##',      $arrSizesValue['name'],     $strHeader);
                 $strHeader = str_replace('##width##',     $arrSizesValue['width'],    $strHeader);
                 $strHeader = str_replace('##height##',    $arrSizesValue['height'],   $strHeader);
+
+                $strHeader = preg_replace('/="\/http/', '="http', $strHeader);
 
                 // add to header
                 self::addToHeader($strHeader);
@@ -357,7 +363,7 @@ class Tiles extends Frontend
      */
     protected static function getFilename($strPath='', $strFilenameA='', $strFilenameB='', $strExtension='', $strAlias='', $strJunction='', $strWidth='', $strHeight='')
     {
-        $strData = $strPath
+        $strData = TL_FILES_URL . $strPath
             . '/'
             . (isset($strFilenameB) ? $strFilenameB : $strFilenameA)
             . '.' . $strExtension
@@ -503,7 +509,7 @@ class Tiles extends Frontend
                     $arrSizesValue['width'], $arrSizesValue['height']
                 );
                 
-                \System::getContainer()
+                System::getContainer()
                     ->get('contao.image.image_factory')
                     ->create(
                         $strSourceFile,
