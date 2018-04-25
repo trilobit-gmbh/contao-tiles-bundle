@@ -19,6 +19,7 @@ use Contao\PageModel;
 use Contao\PageRegular;
 use Contao\StringUtil;
 use Contao\Environment;
+use Contao\System;
 
 
 /**
