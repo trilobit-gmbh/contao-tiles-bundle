@@ -124,6 +124,3 @@ $GLOBALS['TL_LANG']['tl_tiles']['options']['webappOrientation']['portrait-second
 $GLOBALS['TL_LANG']['tl_tiles']['options']['iosStatusBarStyle']['default']             = 'Standard';
 $GLOBALS['TL_LANG']['tl_tiles']['options']['iosStatusBarStyle']['black']               = 'Schwarz';
 $GLOBALS['TL_LANG']['tl_tiles']['options']['iosStatusBarStyle']['black-translucent']   = 'Schwarz-Transparent';
-
-
-//https://tomitm.github.io/appmanifest/
