@@ -240,7 +240,7 @@ $GLOBALS['TL_DCA']['tl_tiles'] = array
             'exclude'              => true,
             'inputType'            => 'textarea',
             'eval'                 => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'clr'),
-            'sql'                  => "text NOT NULL default ''"
+            'sql'                  => "mediumtext NULL"
         ),
         'webappDisplay' => array
         (
