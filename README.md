@@ -46,3 +46,9 @@ Fazit
 Das System erzeugt jetzt alle notwendigen Grafiken und bindet diese korrekt in den HTML-Quellcode ein.
 
 Darüber hinaus bietet die Erweiterung auch die Contao-typische Möglichkeit, die Laufzeit zu bestimmen. So können z.B. besondere Favicons für Weihnachten etc erstellt werden.
+
+
+Screenshots
+===========
+
+![](docs/images/contao-tiles-bundle.png)

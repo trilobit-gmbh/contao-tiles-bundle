@@ -1,21 +1,18 @@
 <?php
 
-/**
- * Contao Open Source CMS
- *
- * Copyright (c) 2005-2015 Leo Feyer
- *
- * @license LGPL-3.0+
+/*
+ * @copyright  trilobit GmbH
+ * @author     trilobit GmbH <https://github.com/trilobit-gmbh>
+ * @license    LGPL-3.0-or-later
+ * @link       http://github.com/trilobit-gmbh/contao-tiles-bundle
  */
 
 namespace Trilobit\TilesBundle;
 
 use Model;
 
-
 /**
- * Class TilesModel
- * @package Trilobit\TilesBundle
+ * Class TilesModel.
  */
 class TilesModel extends Model
 {
