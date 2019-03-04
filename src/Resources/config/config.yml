@@ -29,7 +29,7 @@ trilobit:
                 tag: 'link'
                 attributes:
                     rel: 'apple-touch-icon'
-                    href: '##target##/##alias####junction####filename##.##extension##'
+                    href: '##target##/##filename##.##extension##'
                     sizes: '##width##x##height##'
 
                 extension: 'png'
@@ -78,6 +78,8 @@ trilobit:
                       height: 96
                     - width: 144
                       height: 144
+                    - width: 512
+                      height: 512
                     - width: 192
                       height: 192
                     - width: 192
@@ -91,56 +93,26 @@ trilobit:
                     content: '##target##/##filename##.##extension##'
                     name: '##name##'
 
-                extension: 'png'
+                extension: 'jpg'
                 filename: 'mstile-##width##x##height##'
                 sizes:
-                    - width: 128
-                      height: 128
-                      name: 'msapplication-square70x70logo'
-                      filename: 'smalltile'
-                    - width: 270
-                      height: 270
-                      name: 'msapplication-square150x150logo'
-                      filename: 'mediumtile'
-                    - width: 558
-                      height: 270
-                      name: 'msapplication-wide310x150logo'
-                      filename: 'widetile'
-                    - width: 558
-                      height: 558
-                      name: 'msapplication-square310x310logo'
-                      filename: 'largetile'
+                - width: 128
+                  height: 128
+                  name: 'msapplication-square70x70logo'
+                  filename: 'small'
+                - width: 270
+                  height: 270
+                  name: 'msapplication-square150x150logo'
+                  filename: 'medium'
+                - width: 558
+                  height: 270
+                  name: 'msapplication-wide310x150logo'
+                  filename: 'wide'
+                - width: 558
+                  height: 558
+                  name: 'msapplication-square310x310logo'
+                  filename: 'large'
 
-#            firefox:
-#                tag: meta
-#                attributes:
-#                    content: '##target##/##filename##.##extension##'
-#                    name: '##name##'
-#
-#                extension: png
-#                filename: firefox-icon-##width##x##height##
-#                sizes:
-#                    - width: 16
-#                      height: 16
-#                   - width: 30
-#                    height: 30
-#                    - width: 32
-#                      height: 32
-#                    - width: 48
-#                      height: 48
-#                    - width: 60
-#                      height: 60
-#                    - width: 64
-#                      height: 64
-#                    - width: 90
-#                      height: 90
-#                    - width: 120
-#                      height: 128
-#                    - width: 128
-#                      height: 128
-#                    - width: 256
-#                      height: 256
-#
             icon:
                 tag: 'link'
                 attributes:
@@ -166,6 +138,28 @@ trilobit:
                       height: 192
                     - width: 196
                       height: 196
+
+        favicon:
+            tag: 'link'
+            attributes:
+                href: '##target##/##filename##.##extension##'
+                integration:
+                - rel: 'shortcut icon'
+                  type: 'image/x-icon'
+                - rel: 'icon'
+                  type: 'image/ico'
+            source: '##target##/favicon-196x196.png'
+            extension: 'ico'
+            filename: 'favicon'
+            sizes:
+            - 0: 16
+              1: 16
+            - 0: 24
+              1: 24
+            - 0: 32
+              1: 32
+            - 0: 48
+              1: 48
 
         additionals:
             windows:
@@ -208,8 +202,8 @@ trilobit:
                 windowsRss:
                     tag: 'meta'
                     attributes:
-                        name: 'msapplication-window'
-                        content: 'frequency=##windowsRssFrequency##; polling-uri=##windowsRss##'
+                        name: 'msapplication-notification'
+                        content: 'frequency=##windowsRssFrequency##;polling-uri=##windowsRss##;polling-uri2=##windowsRss##;polling-uri3=##windowsRss##;polling-uri4=##windowsRss##;polling-uri5=##windowsRss##; cycle=1'
 
             ios:
                 iosApp:
@@ -238,12 +232,12 @@ trilobit:
                         content: 'yes'
 
             webApp:
-                manifest:
-                    tag: 'link'
-                    attributes:
-                        rel: 'manifest'
-                        href: '##target##/##alias##.json'
-
+#                manifest:
+#                    tag: 'link'
+#                    attributes:
+#                        rel: 'manifest'
+#                        href: '##target##/##alias##.json'
+#
                 webappName:
                     tag: 'meta'
                     attributes:
@@ -253,7 +247,7 @@ trilobit:
                 webappShortName:
                     tag: 'meta'
                     attributes:
-                        name: 'short_name'
+                        name: 'short-name'
                         content: '##webappShortName##'
 
                 webappDescription:
@@ -277,13 +271,13 @@ trilobit:
                 webappThemeColor:
                     tag: 'meta'
                     attributes:
-                        name: 'theme_color'
+                        name: 'theme-color'
                         content: '###webappThemeColor##'
 
                 webappBackgroundColor:
                     tag: 'meta'
                     attributes:
-                        name: 'background_color'
+                        name: 'background-color'
                         content: '###webappBackgroundColor##'
 
 #        webApp:

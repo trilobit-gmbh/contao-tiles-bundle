@@ -19,6 +19,7 @@ use Contao\PageModel;
 use Contao\PageRegular;
 use Contao\StringUtil;
 use Contao\System;
+use PHP_ICO;
 
 /**
  * Class Tiles.
@@ -46,12 +47,15 @@ class Tiles extends Frontend
         if (null === $objElements) {
             return;
         }
+
         //$arrSettings = Helper::getConfigData();
         $arrData = [];
 
-        $static = (TL_FILES_URL !== '' ? TL_FILES_URL : Environment::get('url').'/');
+        //$static = (TL_FILES_URL !== '' ? TL_FILES_URL : Environment::get('url').'/');
+        $static = (TL_FILES_URL !== '' ? TL_FILES_URL : '/');
 
         while ($objElements->next()) {
+            $intLastUpdate = $objElements->tstamp;
             $arrPages = StringUtil::deserialize($objElements->pages, true);
 
             $objTarget = FilesModel::findByPk($objElements->target);
@@ -63,14 +67,14 @@ class Tiles extends Frontend
         }
 
         if (isset($arrTiles[$objPage->id])) {
-            self::processData($arrData[$objPage->id]);
+            self::processData($arrData[$objPage->id], $intLastUpdate);
         } else {
             $objParentPages = PageModel::findParentsById($objPage->id);
 
             if (null !== $objParentPages) {
                 while ($objParentPages->next()) {
                     if (isset($arrData[$objParentPages->id])) {
-                        self::processData($arrData[$objParentPages->id]);
+                        self::processData($arrData[$objParentPages->id], $intLastUpdate);
                         break;
                     }
                 }
@@ -80,16 +84,18 @@ class Tiles extends Frontend
 
     /**
      * @param array $arrData
+     * @param mixed $intLastUpdate
      */
-    public function processData($arrData = [])
+    public function processData($arrData = [], $intLastUpdate = '')
     {
         $arrSettings = Helper::getConfigData();
+        $arrSettings['system']['lastupdate'] = $intLastUpdate;
 
-        self::addImageData($arrData, $arrSettings);
+        self::processImageData($arrData, $arrSettings);
 
-        self::addAdditionalData($arrData, $arrSettings);
+        self::processAdditionalData($arrData, $arrSettings);
 
-        //self::processDataFavicon($arrData, $arrSettings);
+        self::processFaviconData($arrData, $arrSettings);
     }
 
     /**
@@ -115,6 +121,7 @@ class Tiles extends Frontend
         if (!\is_array($arrSettings['images'])) {
             return;
         }
+
         foreach ($arrSettings['images'] as $strGroupKey => $value) {
             $strReturn .= '<div class="clr widget">'
                 .'<h3><label>'
@@ -176,6 +183,8 @@ class Tiles extends Frontend
 
     /**
      * @param null $objData
+     *
+     * @throws \Exception
      */
     public function generateTiles($objData = null)
     {
@@ -250,18 +259,16 @@ class Tiles extends Frontend
         */
 
         // generate favicon
-        /*
         $strFaviconSourceForIcoFilename = $arrSettings['favicon']['source'];
-        $strFaviconSourceForIcoFilename = str_replace('##target##',   $objTarget->path,         $strFaviconSourceForIcoFilename);
-        $strFaviconSourceForIcoFilename = str_replace('##alias##',    $objData->alias, $strFaviconSourceForIcoFilename);
-        $strFaviconSourceForIcoFilename = str_replace('##junction##', $arrSettings['system']['junction'],       $strFaviconSourceForIcoFilename);
+        $strFaviconSourceForIcoFilename = str_replace('##target##', $objTarget->path, $strFaviconSourceForIcoFilename);
+        $strFaviconSourceForIcoFilename = str_replace('##alias##', $objData->alias, $strFaviconSourceForIcoFilename);
+        $strFaviconSourceForIcoFilename = str_replace('##junction##', $arrSettings['system']['junction'], $strFaviconSourceForIcoFilename);
 
-        \Trilobit\Tiles::createIcoFile(
-            TL_ROOT . '/' . $strFaviconSourceForIcoFilename,
-            $objTarget->path . '/' . $objData->alias . $arrSettings['system']['junction'] . $arrSettings['favicon']['filename'] . '.' . $arrSettings['favicon']['extension'],
+        self::createIcoFile(
+            TL_ROOT.'/'.$strFaviconSourceForIcoFilename,
+            $objTarget->path.'/'.$arrSettings['favicon']['filename'].'.'.$arrSettings['favicon']['extension'],
             $arrSettings['favicon']['sizes']
         );
-        */
 
         Database::getInstance()
             ->prepare('UPDATE tl_tiles SET forceUpdate=? WHERE id=?')
@@ -273,7 +280,7 @@ class Tiles extends Frontend
      * @param array $arrData
      * @param array $arrSettings
      */
-    protected function addImageData($arrData = [], $arrSettings = [])
+    protected function processImageData($arrData = [], $arrSettings = [])
     {
         if (!\is_array($arrSettings['images'])) {
             return;
@@ -309,6 +316,7 @@ class Tiles extends Frontend
                 $strHeader = str_replace('##name##', $arrSizesValue['name'], $strHeader);
                 $strHeader = str_replace('##width##', $arrSizesValue['width'], $strHeader);
                 $strHeader = str_replace('##height##', $arrSizesValue['height'], $strHeader);
+                $strHeader = str_replace('##lastupdate##', $arrSettings['system']['lastupdate'], $strHeader);
 
                 $strHeader = preg_replace('/="\/http/', '="http', $strHeader);
 
@@ -322,7 +330,7 @@ class Tiles extends Frontend
      * @param array $arrData
      * @param array $arrSettings
      */
-    protected function addAdditionalData($arrData = [], $arrSettings = [])
+    protected function processAdditionalData($arrData = [], $arrSettings = [])
     {
         if (!\is_array($arrSettings['additionals'])) {
             return;
@@ -356,12 +364,14 @@ class Tiles extends Frontend
      * @param array $arrData
      * @param array $arrSettings
      */
-    protected function processDataFavicon($arrData = [], $arrSettings = [])
+    protected function processFaviconData($arrData = [], $arrSettings = [])
     {
-        if (!\is_array($arrSettings['favicon']['integration'])) {
+        if (!\is_array($arrSettings['favicon']['attributes']['integration'])) {
             return;
         }
-        foreach ($arrSettings['favicon']['integration'] as $value) {
+        self::addToHeader('<!--- favicon --->');
+
+        foreach ($arrSettings['favicon']['attributes']['integration'] as $value) {
             $strHeader = '<'.$arrSettings['favicon']['tag'].' ';
 
             foreach ($value as $strAttributeKey => $strAttributeValue) {
@@ -369,6 +379,9 @@ class Tiles extends Frontend
             }
 
             foreach ($arrSettings['favicon']['attributes'] as $strAttributeKey => $strAttributeValue) {
+                if ('integration' === $strAttributeKey) {
+                    continue;
+                }
                 $strHeader .= $strAttributeKey.'="'.$strAttributeValue.'" ';
             }
 
@@ -381,6 +394,7 @@ class Tiles extends Frontend
             $strHeader = str_replace('##extension##', $arrSettings['favicon']['extension'], $strHeader);
             $strHeader = str_replace('##filename##', $arrSettings['favicon']['filename'], $strHeader);
             $strHeader = str_replace('##name##', $arrSettings['favicon']['name'], $strHeader);
+            $strHeader = str_replace('##lastupdate##', $arrSettings['system']['lastupdate'], $strHeader);
 
             self::addToHeader($strHeader);
         }
@@ -498,7 +512,8 @@ class Tiles extends Frontend
      */
     protected static function getFilename($strPath = '', $strFilenameA = '', $strFilenameB = '', $strExtension = '', $strAlias = '', $strJunction = '', $strWidth = '', $strHeight = '')
     {
-        $strData = TL_FILES_URL.$strPath
+        //$strData = TL_FILES_URL.$strPath
+        $strData = $strPath
             .'/'
             .(isset($strFilenameB) ? $strFilenameB : $strFilenameA)
             .'.'.$strExtension
@@ -538,9 +553,7 @@ class Tiles extends Frontend
      */
     protected function createIcoFile($strSourceFile, $strTargetFile, $arrFaviconSizes)
     {
-        require_once self::getVendowDir().'/vendor/class-php-ico.php';
-
-        $objIconFile = new \PHP_ICO($strSourceFile, $arrFaviconSizes);
+        $objIconFile = new PHP_ICO($strSourceFile, $arrFaviconSizes);
         $objFile = new \File($strTargetFile);
         $objFile->write($objIconFile->_get_ico_data());
         $objFile->close();
