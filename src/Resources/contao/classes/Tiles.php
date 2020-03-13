@@ -286,7 +286,7 @@ class Tiles extends Frontend
             return;
         }
         foreach ($arrSettings['images'] as $key => $value) {
-            self::addToHeader('<!--- images::'.$key.' --->');
+            self::addToHeader('<!-- images::'.$key.' -->');
 
             foreach ($value['sizes'] as $strSizesKey => $arrSizesValue) {
                 $strHeader = '<'.$value['tag'];
@@ -336,7 +336,7 @@ class Tiles extends Frontend
             return;
         }
         foreach ($arrSettings['additionals'] as $key => $value) {
-            self::addToHeader('<!--- additionals::'.$key.' --->');
+            self::addToHeader('<!-- additionals::'.$key.' -->');
 
             foreach ($value as $strItemKey => $arrItemValue) {
                 if ('' === $arrData[$strItemKey] || null === $arrData[$strItemKey]) {
@@ -369,7 +369,7 @@ class Tiles extends Frontend
         if (!\is_array($arrSettings['favicon']['attributes']['integration'])) {
             return;
         }
-        self::addToHeader('<!--- favicon --->');
+        self::addToHeader('<!-- favicon -->');
 
         foreach ($arrSettings['favicon']['attributes']['integration'] as $value) {
             $strHeader = '<'.$arrSettings['favicon']['tag'].' ';
