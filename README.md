@@ -52,3 +52,10 @@ Screenshots
 ===========
 
 ![](docs/images/contao-tiles-bundle.png)
+
+
+Compatibility
+-------------
+
+- Contao version ~4.4
+- Contao version ~4.9
