@@ -407,6 +407,8 @@ class Tiles extends Frontend
      */
     protected function prepareData($objData)
     {
+        global $objPage;
+        
         $arrWebappThemeColor = StringUtil::deserialize($objData->webappThemeColor, true);
         $strWebappThemeColor = $arrWebappThemeColor[0];
 
@@ -462,6 +464,10 @@ class Tiles extends Frontend
                 'webappThemeColor' => $strWebappThemeColor,
                 'webappBackgroundColor' => $strWebappBackgroundColor,
             ];
+            
+            if (!empty($objPage->description)) {
+                unset($arrWebapp['webappDescription']);
+            }
         }
 
         if ($objData->addIos) {
