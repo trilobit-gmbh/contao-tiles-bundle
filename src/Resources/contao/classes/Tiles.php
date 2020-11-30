@@ -458,15 +458,15 @@ class Tiles extends Frontend
             $arrWebapp = [
                 'webappName' => $objData->webappName,
                 'webappShortName' => $objData->webappShortName,
-                'webappDescription' => $objData->webappDescription,
+                //'webappDescription' => $objData->webappDescription,
                 'webappDisplay' => $objData->webappDisplay,
                 'webappOrientation' => $objData->webappOrientation,
                 'webappThemeColor' => $strWebappThemeColor,
                 'webappBackgroundColor' => $strWebappBackgroundColor,
             ];
             
-            if (!empty($objPage->description)) {
-                unset($arrWebapp['webappDescription']);
+            if (empty($objPage->description)) {
+                $objPage->description = $objData->webappDescription;
             }
         }
 
