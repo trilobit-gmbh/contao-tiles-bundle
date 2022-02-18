@@ -313,10 +313,10 @@ class Tiles extends Frontend
                 $strHeader = str_replace('##extension##', $value['extension'], $strHeader);
 
                 $strHeader = str_replace('##filename##', isset($arrSizesValue['filename']) ? $arrSizesValue['filename'] : $value['filename'], $strHeader);
-                $strHeader = str_replace('##name##', $arrSizesValue['name'], $strHeader);
-                $strHeader = str_replace('##width##', $arrSizesValue['width'], $strHeader);
-                $strHeader = str_replace('##height##', $arrSizesValue['height'], $strHeader);
-                $strHeader = str_replace('##lastupdate##', $arrSettings['system']['lastupdate'], $strHeader);
+                $strHeader = str_replace('##name##', isset($arrSizesValue['name']) ? $arrSizesValue['name'] : '', $strHeader);
+                $strHeader = str_replace('##width##', isset($arrSizesValue['width']) ? $arrSizesValue['width'] : '', $strHeader);
+                $strHeader = str_replace('##height##', isset($arrSizesValue['height']) ? $arrSizesValue['height'] : '', $strHeader);
+                $strHeader = str_replace('##lastupdate##', isset($arrSettings['system']['lastupdate']) ? $arrSettings['system']['lastupdate'] : '', $strHeader);
 
                 $strHeader = preg_replace('/="\/http/', '="http', $strHeader);
 
@@ -339,7 +339,7 @@ class Tiles extends Frontend
             self::addToHeader('<!-- additionals::'.$key.' -->');
 
             foreach ($value as $strItemKey => $arrItemValue) {
-                if ('' === $arrData[$strItemKey] || null === $arrData[$strItemKey]) {
+                if (!isset($arrData[$strItemKey]) || '' === $arrData[$strItemKey] || null === $arrData[$strItemKey]) {
                     continue;
                 }
 
@@ -391,10 +391,10 @@ class Tiles extends Frontend
                 $strHeader = str_replace('##'.$dKey.'##', $dValue, $strHeader);
             }
 
-            $strHeader = str_replace('##extension##', $arrSettings['favicon']['extension'], $strHeader);
-            $strHeader = str_replace('##filename##', $arrSettings['favicon']['filename'], $strHeader);
-            $strHeader = str_replace('##name##', $arrSettings['favicon']['name'], $strHeader);
-            $strHeader = str_replace('##lastupdate##', $arrSettings['system']['lastupdate'], $strHeader);
+            $strHeader = str_replace('##extension##', isset($arrSettings['favicon']['extension']) ? $arrSettings['favicon']['extension'] : '', $strHeader);
+            $strHeader = str_replace('##filename##', isset($arrSettings['favicon']['filename']) ? $arrSettings['favicon']['filename'] : '', $strHeader);
+            $strHeader = str_replace('##name##', isset($arrSettings['favicon']['name']) ? $arrSettings['favicon']['name'] : '', $strHeader);
+            $strHeader = str_replace('##lastupdate##', isset($arrSettings['system']['lastupdate']) ? $arrSettings['system']['lastupdate'] : '', $strHeader);
 
             self::addToHeader($strHeader);
         }
@@ -410,21 +410,21 @@ class Tiles extends Frontend
         global $objPage;
         
         $arrWebappThemeColor = StringUtil::deserialize($objData->webappThemeColor, true);
-        $strWebappThemeColor = $arrWebappThemeColor[0];
+        $strWebappThemeColor = count($arrWebappThemeColor) > 0 ? $arrWebappThemeColor[0] : '';
 
         $arrWebappBackgroundColor = StringUtil::deserialize($objData->webappBackgroundColor, true);
-        $strWebappBackgroundColor = $arrWebappBackgroundColor[0];
+        $strWebappBackgroundColor = count($arrWebappBackgroundColor) > 0 ? $arrWebappBackgroundColor[0] : '';
 
         $arrWindowsTileColor = StringUtil::deserialize($objData->windowsTileColor, true);
-        $strWindowsTileColor = $arrWindowsTileColor[0];
+        $strWindowsTileColor = count($arrWindowsTileColor) > 0 ? $arrWindowsTileColor[0] : '';
 
         $arrWindowsTooltipColor = StringUtil::deserialize($objData->windowsTooltipColor, true);
-        $strWindowsTooltipColor = $arrWindowsTooltipColor[0];
+        $strWindowsTooltipColor = count($arrWindowsTooltipColor) > 0 ? $arrWindowsTooltipColor[0] : '';
 
         $arrWindowsSize = StringUtil::deserialize($objData->windowsSize, true);
 
         $strWindowsRssFrequency = ('' !== $objData->windowsRss ? ('' !== $objData->windowsRssFrequency ? $objData->windowsRssFrequency : 30) : '');
-        $strWindowsSize = ('' !== $arrWindowsSize[0] && '' !== $arrWindowsSize[1] ? 'width='.$arrWindowsSize[0].';height='.$arrWindowsSize[1] : '');
+        $strWindowsSize = (count($arrWindowsSize) > 1 && '' !== $arrWindowsSize[0] && '' !== $arrWindowsSize[1] ? 'width='.$arrWindowsSize[0].';height='.$arrWindowsSize[1] : '');
 
         $arrSettings = Helper::getConfigData();
 
