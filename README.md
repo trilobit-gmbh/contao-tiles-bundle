@@ -1,7 +1,7 @@
 Tiles bundle
 ============
 
-This is a bundle for [Contao CMS] (version 4.4.x).
+This is a bundle for [Contao CMS]
 
 With trilobit_tiles you can automatically generate favicons, tiles and touch icons for different devices from one single image and include it into the source code.
 
@@ -26,7 +26,7 @@ It furthermore offers the Contao typical possibilities to determine the runtime,
 Tiles Bundle
 ============
 
-Dies ist ein Bundle für [Contao CMS] (Version 4.4.x).
+Dies ist ein Bundle für [Contao CMS]
 
 trilobit_tiles kann unter Contao automatisch aus einem einzigen auszuwählenden Bild Favicons, Kacheln und Touch Icons für verschiedene Geräte erzeugen und in den Quellcode einbinden.
 
@@ -57,5 +57,5 @@ Screenshots
 Compatibility
 -------------
 
-- Contao version ~4.4
 - Contao version ~4.9
+- Contao version ~4.13
