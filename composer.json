@@ -10,15 +10,14 @@
         }
     ],
     "require": {
-        "php": "^5.6|^7.0|^8.0",
+        "php": "^7.3|^8.0",
         "contao/core-bundle": "~4.4",
         "codefog/contao-haste": "^4.0",
         "chrisjean/php-ico": "^1.0"
     },
     "require-dev": {
         "contao/manager-plugin": "^2.0",
-        "friendsofphp/php-cs-fixer": "^2.1",
-        "leofeyer/optimize-native-functions-fixer": "^1.1"
+        "friendsofphp/php-cs-fixer": "^2.1"
     },
     "conflict": {
         "contao/manager-plugin": "<2.0 || >=3.0"
@@ -39,5 +38,12 @@
     },
     "extra": {
         "contao-manager-plugin": "Trilobit\\TilesBundle\\ContaoManager\\Plugin"
+    },
+    "config": {
+        "allow-plugins": {
+            "contao-components/installer": true,
+            "contao-community-alliance/composer-plugin": true,
+            "contao/manager-plugin": true
+        }
     }
 }
