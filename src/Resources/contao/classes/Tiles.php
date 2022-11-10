@@ -26,11 +26,6 @@ use PHP_ICO;
  */
 class Tiles extends Frontend
 {
-    /**
-     * @param PageModel   $objPage
-     * @param LayoutModel $objLayout
-     * @param PageRegular $objPageRegular
-     */
     public function generatePageHook(PageModel $objPage, LayoutModel $objLayout, PageRegular $objPageRegular)
     {
         global $objPage;
@@ -128,9 +123,12 @@ class Tiles extends Frontend
                 .(isset($GLOBALS['TL_LANG']['tl_tiles']['template'][$strGroupKey]) ? $GLOBALS['TL_LANG']['tl_tiles']['template'][$strGroupKey] : '__'.$strGroupKey.'__')
                 .'</label></h3>'
                 .'</div>'
-                ;
+            ;
 
             foreach ($value['sizes'] as $strSizesKey => $arrSizesValue) {
+                if (!isset($arrSizesValue['filename'])) {
+                    $arrSizesValue['filename'] = $value['filename'];
+                }
                 $strFilename = self::getFilename(
                     $strDestinationPath, $value['filename'], $arrSizesValue['filename'], $value['extension'],
                     $objData->alias,
@@ -148,28 +146,28 @@ class Tiles extends Frontend
                 if (is_file(TL_ROOT.'/'.$strFilename)) {
                     $strReturn .= '<div class="widget preview">'
                         .'<div class="image-container">'
-                            .'<span>'
-                                .'<img src="'.$strFilename.'?t='.time().'" width="'.$arrSizesValue['width'].'" height="'.$arrSizesValue['height'].'">'
-                            .'</span>'
+                        .'<span>'
+                        .'<img src="'.$strFilename.'?t='.time().'" width="'.$arrSizesValue['width'].'" height="'.$arrSizesValue['height'].'">'
+                        .'</span>'
                         .'</div>'
 
                         .'<br>'
 
                         .'<table class="tl_show">'
-                            .'<tbody>'
-                                .'<tr>'
-                                    .'<td class="tl_bg"><span class="tl_label">ID: </span></td>'
-                                    .'<td class="tl_bg">'.substr($strTitle, 1).'</td>'
-                                .'</tr>'
-                                .'<tr>'
-                                    .'<td class=""><span class="tl_label">width: </span></td>'
-                                    .'<td class="">'.$arrSizesValue['width'].'</td>'
-                                .'</tr>'
-                                .'<tr>'
-                                    .'<td class="tl_bg"><span class="tl_label">height: </span></td>'
-                                    .'<td class="tl_bg">'.$arrSizesValue['height'].'</td>'
-                                .'</tr>'
-                            .'</tbody>'
+                        .'<tbody>'
+                        .'<tr>'
+                        .'<td class="tl_bg"><span class="tl_label">ID: </span></td>'
+                        .'<td class="tl_bg">'.substr($strTitle, 1).'</td>'
+                        .'</tr>'
+                        .'<tr>'
+                        .'<td class=""><span class="tl_label">width: </span></td>'
+                        .'<td class="">'.$arrSizesValue['width'].'</td>'
+                        .'</tr>'
+                        .'<tr>'
+                        .'<td class="tl_bg"><span class="tl_label">height: </span></td>'
+                        .'<td class="tl_bg">'.$arrSizesValue['height'].'</td>'
+                        .'</tr>'
+                        .'</tbody>'
                         .'</table>'
 
                         .'</div>'
@@ -186,7 +184,7 @@ class Tiles extends Frontend
      *
      * @throws \Exception
      */
-    public function generateTiles($objData = null)
+    public static function generateTiles($objData = null)
     {
         $objImage = FilesModel::findByUuid($objData->singleSRC);
         $objTarget = FilesModel::findByPk($objData->target);
@@ -198,13 +196,16 @@ class Tiles extends Frontend
         $strDestinationPath = TL_ROOT.'/'.$objTarget->path;
 
         $arrSettings = Helper::getConfigData();
-        $arrData = self::prepareData($objData);
+        //$arrData = self::prepareData($objData);
 
         $arrJson = [];
 
         // generate tiles
         foreach ($arrSettings['images'] as $strGroupKey => $value) {
             foreach ($value['sizes'] as $strSizesKey => $arrSizesValue) {
+                if (!isset($arrSizesValue['filename'])) {
+                    $arrSizesValue['filename'] = $value['filename'];
+                }
                 $strFilename = self::getFilename(
                     $strDestinationPath, $value['filename'], $arrSizesValue['filename'], $value['extension'],
                     $objData->alias,
@@ -313,10 +314,10 @@ class Tiles extends Frontend
                 $strHeader = str_replace('##extension##', $value['extension'], $strHeader);
 
                 $strHeader = str_replace('##filename##', isset($arrSizesValue['filename']) ? $arrSizesValue['filename'] : $value['filename'], $strHeader);
-                $strHeader = str_replace('##name##', $arrSizesValue['name'], $strHeader);
-                $strHeader = str_replace('##width##', $arrSizesValue['width'], $strHeader);
-                $strHeader = str_replace('##height##', $arrSizesValue['height'], $strHeader);
-                $strHeader = str_replace('##lastupdate##', $arrSettings['system']['lastupdate'], $strHeader);
+                $strHeader = str_replace('##name##', isset($arrSizesValue['name']) ? $arrSizesValue['name'] : '', $strHeader);
+                $strHeader = str_replace('##width##', isset($arrSizesValue['width']) ? $arrSizesValue['width'] : '', $strHeader);
+                $strHeader = str_replace('##height##', isset($arrSizesValue['height']) ? $arrSizesValue['height'] : '', $strHeader);
+                $strHeader = str_replace('##lastupdate##', isset($arrSettings['system']['lastupdate']) ? $arrSettings['system']['lastupdate'] : '', $strHeader);
 
                 $strHeader = preg_replace('/="\/http/', '="http', $strHeader);
 
@@ -339,7 +340,7 @@ class Tiles extends Frontend
             self::addToHeader('<!-- additionals::'.$key.' -->');
 
             foreach ($value as $strItemKey => $arrItemValue) {
-                if ('' === $arrData[$strItemKey] || null === $arrData[$strItemKey]) {
+                if (!isset($arrData[$strItemKey]) || '' === $arrData[$strItemKey] || null === $arrData[$strItemKey]) {
                     continue;
                 }
 
@@ -391,10 +392,10 @@ class Tiles extends Frontend
                 $strHeader = str_replace('##'.$dKey.'##', $dValue, $strHeader);
             }
 
-            $strHeader = str_replace('##extension##', $arrSettings['favicon']['extension'], $strHeader);
-            $strHeader = str_replace('##filename##', $arrSettings['favicon']['filename'], $strHeader);
-            $strHeader = str_replace('##name##', $arrSettings['favicon']['name'], $strHeader);
-            $strHeader = str_replace('##lastupdate##', $arrSettings['system']['lastupdate'], $strHeader);
+            $strHeader = str_replace('##extension##', isset($arrSettings['favicon']['extension']) ? $arrSettings['favicon']['extension'] : '', $strHeader);
+            $strHeader = str_replace('##filename##', isset($arrSettings['favicon']['filename']) ? $arrSettings['favicon']['filename'] : '', $strHeader);
+            $strHeader = str_replace('##name##', isset($arrSettings['favicon']['name']) ? $arrSettings['favicon']['name'] : '', $strHeader);
+            $strHeader = str_replace('##lastupdate##', isset($arrSettings['system']['lastupdate']) ? $arrSettings['system']['lastupdate'] : '', $strHeader);
 
             self::addToHeader($strHeader);
         }
@@ -405,26 +406,26 @@ class Tiles extends Frontend
      *
      * @return array
      */
-    protected function prepareData($objData)
+    protected static function prepareData($objData)
     {
         global $objPage;
-        
+
         $arrWebappThemeColor = StringUtil::deserialize($objData->webappThemeColor, true);
-        $strWebappThemeColor = $arrWebappThemeColor[0];
+        $strWebappThemeColor = \count($arrWebappThemeColor) > 0 ? $arrWebappThemeColor[0] : '';
 
         $arrWebappBackgroundColor = StringUtil::deserialize($objData->webappBackgroundColor, true);
-        $strWebappBackgroundColor = $arrWebappBackgroundColor[0];
+        $strWebappBackgroundColor = \count($arrWebappBackgroundColor) > 0 ? $arrWebappBackgroundColor[0] : '';
 
         $arrWindowsTileColor = StringUtil::deserialize($objData->windowsTileColor, true);
-        $strWindowsTileColor = $arrWindowsTileColor[0];
+        $strWindowsTileColor = \count($arrWindowsTileColor) > 0 ? $arrWindowsTileColor[0] : '';
 
         $arrWindowsTooltipColor = StringUtil::deserialize($objData->windowsTooltipColor, true);
-        $strWindowsTooltipColor = $arrWindowsTooltipColor[0];
+        $strWindowsTooltipColor = \count($arrWindowsTooltipColor) > 0 ? $arrWindowsTooltipColor[0] : '';
 
         $arrWindowsSize = StringUtil::deserialize($objData->windowsSize, true);
 
         $strWindowsRssFrequency = ('' !== $objData->windowsRss ? ('' !== $objData->windowsRssFrequency ? $objData->windowsRssFrequency : 30) : '');
-        $strWindowsSize = ('' !== $arrWindowsSize[0] && '' !== $arrWindowsSize[1] ? 'width='.$arrWindowsSize[0].';height='.$arrWindowsSize[1] : '');
+        $strWindowsSize = (\count($arrWindowsSize) > 1 && '' !== $arrWindowsSize[0] && '' !== $arrWindowsSize[1] ? 'width='.$arrWindowsSize[0].';height='.$arrWindowsSize[1] : '');
 
         $arrSettings = Helper::getConfigData();
 
@@ -464,7 +465,7 @@ class Tiles extends Frontend
                 'webappThemeColor' => $strWebappThemeColor,
                 'webappBackgroundColor' => $strWebappBackgroundColor,
             ];
-            
+
             if (empty($objPage->description)) {
                 $objPage->description = $objData->webappDescription;
             }
@@ -557,7 +558,7 @@ class Tiles extends Frontend
      *
      * @throws \Exception
      */
-    protected function createIcoFile($strSourceFile, $strTargetFile, $arrFaviconSizes)
+    protected static function createIcoFile($strSourceFile, $strTargetFile, $arrFaviconSizes)
     {
         $objIconFile = new PHP_ICO($strSourceFile, $arrFaviconSizes);
         $objFile = new \File($strTargetFile);

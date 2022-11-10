@@ -70,7 +70,7 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
                 'label' => &$GLOBALS['TL_LANG']['tl_tiles']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
-                'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
+                'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
             ],
             'toggle' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_tiles']['toggle'],
@@ -437,9 +437,6 @@ class tl_tiles extends Backend
         $this->import('BackendUser', 'User');
     }
 
-    /**
-     * @param DataContainer $dc
-     */
     public function generateTiles(DataContainer $dc)
     {
         // Return if there is no ID
@@ -451,11 +448,9 @@ class tl_tiles extends Backend
     }
 
     /**
-     * @param DataContainer $dc
-     *
      * @return string|void
      */
-    public function previewIcons(\DataContainer $dc)
+    public function previewIcons(DataContainer $dc)
     {
         // Return if there is no ID
         if (!$dc->id) {
@@ -470,7 +465,6 @@ class tl_tiles extends Backend
 
     /**
      * @param $varValue
-     * @param DataContainer $dc
      *
      * @throws Exception
      *
@@ -503,8 +497,6 @@ class tl_tiles extends Backend
     }
 
     /**
-     * @param DataContainer $dc
-     *
      * @return array
      */
     public function getWebAppManifestDisplayOptions(DataContainer $dc)
@@ -513,8 +505,6 @@ class tl_tiles extends Backend
     }
 
     /**
-     * @param DataContainer $dc
-     *
      * @return array
      */
     public function getWebAppManifestOrientationOptions(DataContainer $dc)
@@ -523,8 +513,6 @@ class tl_tiles extends Backend
     }
 
     /**
-     * @param DataContainer $dc
-     *
      * @return array
      */
     public function getIosStatusBarStyleOptions(DataContainer $dc)
