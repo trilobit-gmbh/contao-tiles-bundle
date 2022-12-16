@@ -11,8 +11,8 @@
     ],
     "require": {
         "php": "^7.3|^8.0",
-        "contao/core-bundle": "~4.4",
-        "codefog/contao-haste": "^4.0",
+        "contao/core-bundle": "~4.9",
+        "codefog/contao-haste": "^4.0|^5.0",
         "chrisjean/php-ico": "^1.0"
     },
     "require-dev": {
