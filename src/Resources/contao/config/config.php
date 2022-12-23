@@ -8,7 +8,9 @@ declare(strict_types=1);
  * @license    LGPL-3.0-or-later
  */
 
-$GLOBALS['TL_HOOKS']['generatePage'][] = ['Trilobit\TilesBundle\Tiles', 'generatePageHook'];
+use Trilobit\TilesBundle\Tiles;
+
+$GLOBALS['TL_HOOKS']['generatePage'][] = [Tiles::class, 'generatePageHook'];
 
 /*
  * Back end module
@@ -20,6 +22,10 @@ $GLOBALS['BE_MOD']['trilobit']['tiles'] = [
 /*
  * Add css
  */
-if (TL_MODE === 'BE') {
+$request = \Contao\System::getContainer()
+    ->get('request_stack')
+    ->getCurrentRequest()
+;
+if ($request && \Contao\System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request)) {
     $GLOBALS['TL_CSS'][] = 'bundles/trilobittiles/css/backend.css';
 }

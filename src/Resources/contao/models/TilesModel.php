@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Trilobit\TilesBundle;
 
-use Model;
+use Contao\Model;
 
 /**
  * Class TilesModel.

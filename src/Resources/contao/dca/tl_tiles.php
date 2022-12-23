@@ -8,6 +8,10 @@ declare(strict_types=1);
  * @license    LGPL-3.0-or-later
  */
 
+use Contao\DC_Table;
+use Contao\System;
+use Trilobit\TilesBundle\Helper;
+
 System::loadLanguageFile('tl_content');
 System::loadLanguageFile('tl_article');
 
@@ -17,16 +21,14 @@ System::loadLanguageFile('tl_article');
 $GLOBALS['TL_DCA']['tl_tiles'] = [
     // Config
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'enableVersioning' => true,
-        'switchToEdit' => true,
         'onsubmit_callback' => [
-            ['tl_tiles', 'generateTiles'],
+            [Helper::class, 'generateTiles'],
         ],
         'sql' => [
             'keys' => [
                 'id' => 'primary',
-                'pid' => 'index',
             ],
         ],
     ],
@@ -34,14 +36,13 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
     // List
     'list' => [
         'sorting' => [
-            'mode' => 1,
-            'fields' => ['name'],
-            'flag' => 1,
+            'mode' => 2,
+            'fields' => ['id', 'name', 'tstamp'],
             'panelLayout' => 'search,limit',
         ],
         'label' => [
-            'fields' => ['name'],
-            'format' => '%s',
+            'fields' => ['id', 'name', 'tstamp'],
+            'showColumns' => true,
         ],
         'global_operations' => [
             'all' => [
@@ -144,7 +145,7 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'inputType' => 'text',
             'eval' => ['rgxp' => 'alias', 'unique' => true, 'maxlength' => 128, 'tl_class' => 'w50'],
             'save_callback' => [
-                ['tl_tiles', 'generateAlias'],
+                [Helper::class, 'generateAlias'],
             ],
             'sql' => "varbinary(128) NOT NULL default ''",
         ],
@@ -189,7 +190,7 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_tiles']['crop'],
             'exclude' => true,
             'inputType' => 'select',
-            'options' => $GLOBALS['TL_CROP'],
+            'options' => &$GLOBALS['TL_CROP'],
             'reference' => &$GLOBALS['TL_LANG']['MSC'],
             'eval' => ['helpwizard' => true, 'tl_class' => 'w50'],
             'sql' => "varchar(64) NOT NULL default ''",
@@ -227,7 +228,7 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_tiles']['webappDisplay'],
             'exclude' => true,
             'inputType' => 'select',
-            'options_callback' => ['tl_tiles', 'getWebAppManifestDisplayOptions'],
+            'options_callback' => [Helper::class, 'getWebAppManifestDisplayOptions'],
             'reference' => &$GLOBALS['TL_LANG']['tl_tiles']['options']['webappDisplay'],
             'eval' => ['chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'clr w50'],
             'sql' => "varchar(64) NOT NULL default ''",
@@ -236,7 +237,7 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_tiles']['webappOrientation'],
             'exclude' => true,
             'inputType' => 'select',
-            'options_callback' => ['tl_tiles', 'getWebAppManifestOrientationOptions'],
+            'options_callback' => [Helper::class, 'getWebAppManifestOrientationOptions'],
             'reference' => &$GLOBALS['TL_LANG']['tl_tiles']['options']['webappOrientation'],
             'eval' => ['chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
             'sql' => "varchar(64) NOT NULL default ''",
@@ -357,7 +358,7 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'sorting' => true,
             'flag' => 1,
             'inputType' => 'select',
-            'options_callback' => ['tl_tiles', 'getIosStatusBarStyleOptions'],
+            'options_callback' => [Helper::class, 'getIosStatusBarStyleOptions'],
             'reference' => &$GLOBALS['TL_LANG']['tl_tiles']['options']['iosStatusBarStyle'],
             'eval' => ['tl_class' => 'w50'],
             'sql' => "varchar(32) NOT NULL default ''",
@@ -382,7 +383,7 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
         ],
 
         'preview' => [
-            'input_field_callback' => ['tl_tiles', 'previewIcons'],
+            'input_field_callback' => [Helper::class, 'previewIcons'],
             'eval' => ['doNotShow' => true],
         ],
         'published' => [
@@ -412,10 +413,8 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
         'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
-        'pid' => [
-            'sql' => "int(10) unsigned NOT NULL default '0'",
-        ],
         'tstamp' => [
+            'flag' => 6,
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'sorting' => [
@@ -423,102 +422,3 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
         ],
     ],
 ];
-
-/**
- * Class tl_tiles.
- */
-class tl_tiles extends Backend
-{
-    /**
-     * tl_tiles constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->import('BackendUser', 'User');
-    }
-
-    public function generateTiles(DataContainer $dc)
-    {
-        // Return if there is no ID
-        if (!$dc->id) {
-            return;
-        }
-
-        \Trilobit\TilesBundle\Tiles::generateTiles($dc->activeRecord);
-    }
-
-    /**
-     * @return string|void
-     */
-    public function previewIcons(DataContainer $dc)
-    {
-        // Return if there is no ID
-        if (!$dc->id) {
-            return;
-        }
-
-        return '<div class="tl_box"><div id="tiles_images">'
-            .\Trilobit\TilesBundle\Tiles::previewIcons($dc->activeRecord)
-            .'</div></div>'
-            ;
-    }
-
-    /**
-     * @param $varValue
-     *
-     * @throws Exception
-     *
-     * @return mixed|string
-     */
-    public function generateAlias($varValue, DataContainer $dc)
-    {
-        $autoAlias = false;
-
-        // Generate alias if there is none
-        if ('' === $varValue) {
-            $autoAlias = true;
-            $varValue = standardize(StringUtil::restoreBasicEntities($dc->activeRecord->name));
-        }
-
-        $objAlias = $this->Database->prepare('SELECT id FROM tl_tiles WHERE alias=?')
-            ->execute($varValue)
-        ;
-
-        // Check whether the news alias exists
-        if ($objAlias->numRows > 1 && !$autoAlias) {
-            throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-        }
-
-        // Add ID to alias
-        if ($objAlias->numRows && $autoAlias) {
-            $varValue .= '-'.$dc->id;
-        }
-
-        return $varValue;
-    }
-
-    /**
-     * @return array
-     */
-    public function getWebAppManifestDisplayOptions(DataContainer $dc)
-    {
-        return array_keys(\Trilobit\TilesBundle\Helper::getConfigData()['options']['webAppManifest']['display']);
-    }
-
-    /**
-     * @return array
-     */
-    public function getWebAppManifestOrientationOptions(DataContainer $dc)
-    {
-        return array_keys(\Trilobit\TilesBundle\Helper::getConfigData()['options']['webAppManifest']['orientation']);
-    }
-
-    /**
-     * @return array
-     */
-    public function getIosStatusBarStyleOptions(DataContainer $dc)
-    {
-        return array_keys(\Trilobit\TilesBundle\Helper::getConfigData()['options']['ios']['statusBar']);
-    }
-}
