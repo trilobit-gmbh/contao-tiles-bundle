@@ -226,11 +226,7 @@ class Tiles extends Frontend
                     (string) $arrSizesValue['width'], (string) $arrSizesValue['height']
                 );
 
-                if (method_exists(ContaoCoreBundle::class, 'getVersion')) {
-                    $version = ContaoCoreBundle::getVersion();
-                } else {
-                    $version = VERSION;
-                }
+                $version = (method_exists(ContaoCoreBundle::class, 'getVersion') ? ContaoCoreBundle::getVersion() : VERSION);
 
                 if (version_compare($version, '4.9', '>')) {
                     $imageFactory = System::getContainer()
