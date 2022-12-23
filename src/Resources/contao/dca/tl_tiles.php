@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright  trilobit GmbH
  * @author     trilobit GmbH <https://github.com/trilobit-gmbh>
  * @license    LGPL-3.0-or-later
- * @link       http://github.com/trilobit-gmbh/contao-tiles-bundle
  */
 
 System::loadLanguageFile('tl_content');
@@ -481,7 +482,8 @@ class tl_tiles extends Backend
         }
 
         $objAlias = $this->Database->prepare('SELECT id FROM tl_tiles WHERE alias=?')
-            ->execute($varValue);
+            ->execute($varValue)
+        ;
 
         // Check whether the news alias exists
         if ($objAlias->numRows > 1 && !$autoAlias) {

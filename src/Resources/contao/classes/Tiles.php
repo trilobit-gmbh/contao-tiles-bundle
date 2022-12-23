@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright  trilobit GmbH
  * @author     trilobit GmbH <https://github.com/trilobit-gmbh>
  * @license    LGPL-3.0-or-later
- * @link       http://github.com/trilobit-gmbh/contao-tiles-bundle
  */
 
 namespace Trilobit\TilesBundle;
@@ -37,7 +38,8 @@ class Tiles extends Frontend
 
         $objElements = Database::getInstance()
             ->prepare('SELECT * FROM tl_tiles WHERE '.$strQuery.'ORDER by sorting ASC')
-            ->execute();
+            ->execute()
+        ;
 
         if (null === $objElements) {
             return;
@@ -78,10 +80,9 @@ class Tiles extends Frontend
     }
 
     /**
-     * @param array $arrData
      * @param mixed $intLastUpdate
      */
-    public function processData($arrData = [], $intLastUpdate = '')
+    public function processData(array $arrData = [], $intLastUpdate = '')
     {
         $arrSettings = Helper::getConfigData();
         $arrSettings['system']['lastupdate'] = $intLastUpdate;
@@ -224,7 +225,8 @@ class Tiles extends Frontend
                         ],
                         $strFilename
                     )
-                    ->getUrl(TL_ROOT);
+                    ->getUrl(TL_ROOT)
+                ;
             }
         }
 
@@ -274,14 +276,11 @@ class Tiles extends Frontend
         Database::getInstance()
             ->prepare('UPDATE tl_tiles SET forceUpdate=? WHERE id=?')
             ->limit(1)
-            ->execute('', $objData->id);
+            ->execute('', $objData->id)
+        ;
     }
 
-    /**
-     * @param array $arrData
-     * @param array $arrSettings
-     */
-    protected function processImageData($arrData = [], $arrSettings = [])
+    protected function processImageData(array $arrData = [], array $arrSettings = [])
     {
         if (!\is_array($arrSettings['images'])) {
             return;
@@ -327,11 +326,7 @@ class Tiles extends Frontend
         }
     }
 
-    /**
-     * @param array $arrData
-     * @param array $arrSettings
-     */
-    protected function processAdditionalData($arrData = [], $arrSettings = [])
+    protected function processAdditionalData(array $arrData = [], array $arrSettings = [])
     {
         if (!\is_array($arrSettings['additionals'])) {
             return;
@@ -361,11 +356,7 @@ class Tiles extends Frontend
         }
     }
 
-    /**
-     * @param array $arrData
-     * @param array $arrSettings
-     */
-    protected function processFaviconData($arrData = [], $arrSettings = [])
+    protected function processFaviconData(array $arrData = [], array $arrSettings = [])
     {
         if (!\is_array($arrSettings['favicon']['attributes']['integration'])) {
             return;
@@ -506,18 +497,9 @@ class Tiles extends Frontend
     }
 
     /**
-     * @param string $strPath
-     * @param string $strFilenameA
-     * @param string $strFilenameB
-     * @param string $strExtension
-     * @param string $strAlias
-     * @param string $strJunction
-     * @param string $strWidth
-     * @param string $strHeight
-     *
      * @return mixed|string
      */
-    protected static function getFilename($strPath = '', $strFilenameA = '', $strFilenameB = '', $strExtension = '', $strAlias = '', $strJunction = '', $strWidth = '', $strHeight = '')
+    protected static function getFilename(string $strPath = '', string $strFilenameA = '', string $strFilenameB = '', string $strExtension = '', string $strAlias = '', string $strJunction = '', string $strWidth = '', string $strHeight = '')
     {
         //$strData = TL_FILES_URL.$strPath
         $strData = $strPath
@@ -529,9 +511,8 @@ class Tiles extends Frontend
         $strData = str_replace('##width##', $strWidth, $strData);
         $strData = str_replace('##height##', $strHeight, $strData);
         $strData = str_replace('##alias##', $strAlias, $strData);
-        $strData = str_replace('##junction##', $strJunction, $strData);
 
-        return $strData;
+        return str_replace('##junction##', $strJunction, $strData);
     }
 
     /**
@@ -546,9 +527,7 @@ class Tiles extends Frontend
             $strData = str_replace('##'.$key.'##', $value, $strData);
         }
 
-        $strData = Controller::replaceInsertTags($strData);
-
-        return $strData;
+        return Controller::replaceInsertTags($strData);
     }
 
     /**
