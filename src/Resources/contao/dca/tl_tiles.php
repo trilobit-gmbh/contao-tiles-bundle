@@ -411,6 +411,7 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'sql' => "varchar(10) NOT NULL default ''",
         ],
         'id' => [
+            'label' => ['ID'],
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
         'tstamp' => [

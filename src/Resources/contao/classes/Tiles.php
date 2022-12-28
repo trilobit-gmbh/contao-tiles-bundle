@@ -516,14 +516,10 @@ class Tiles extends Frontend
      */
     protected function addToHeader($strData)
     {
-        if (method_exists(ContaoCoreBundle::class, 'getVersion')) {
-            $version = ContaoCoreBundle::getVersion();
-        } else {
-            $version = VERSION;
-        }
+        $version = (method_exists(ContaoCoreBundle::class, 'getVersion') ? ContaoCoreBundle::getVersion() : VERSION);
 
         if (version_compare($version, '5.0', '>=')) {
-            $GLOBALS['TL_HEAD'][] = $strData;
+            $GLOBALS['TL_HEAD'][] = System::getContainer()->get('contao.insert_tag.parser')->replace($strData);
         } else {
             $GLOBALS['TL_HEAD'][] = Controller::replaceInsertTags($strData);
         }
