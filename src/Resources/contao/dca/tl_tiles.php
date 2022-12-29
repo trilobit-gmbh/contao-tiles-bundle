@@ -9,11 +9,7 @@ declare(strict_types=1);
  */
 
 use Contao\DC_Table;
-use Contao\System;
 use Trilobit\TilesBundle\Helper;
-
-System::loadLanguageFile('tl_content');
-System::loadLanguageFile('tl_article');
 
 /*
  * Table tl_tiles
@@ -37,16 +33,18 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
     'list' => [
         'sorting' => [
             'mode' => 2,
-            'fields' => ['id', 'name', 'tstamp'],
-            'panelLayout' => 'search,limit',
+            'flag' => 1,
+            'rootPaste' => true,
+            'icon' => 'modules.svg',
+            'fields' => ['name'],
+            'panelLayout' => 'filter;search,limit',
+            'headerFields' => ['name'],
         ],
         'label' => [
-            'fields' => ['id', 'name', 'tstamp'],
-            'showColumns' => true,
+            'fields' => ['name'],
         ],
         'global_operations' => [
             'all' => [
-                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href' => 'act=select',
                 'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
@@ -54,28 +52,23 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_tiles']['edit'],
                 'href' => 'act=edit',
-                'icon' => 'edit.gif',
+                'icon' => 'edit.svg',
             ],
             'copy' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_tiles']['copy'],
                 'href' => 'act=copy',
-                'icon' => 'copy.gif',
+                'icon' => 'copy.svg',
             ],
             'cut' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_tiles']['cut'],
                 'href' => 'act=paste&amp;mode=cut',
-                'icon' => 'cut.gif',
+                'icon' => 'cut.svg',
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_tiles']['delete'],
                 'href' => 'act=delete',
-                'icon' => 'delete.gif',
+                'icon' => 'delete.svg',
                 'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
             ],
             'toggle' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_tiles']['toggle'],
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
                 'haste_ajax_operation' => [
                     'field' => 'published',
@@ -92,7 +85,6 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
                 ],
             ],
             'show' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_tiles']['show'],
                 'href' => 'act=show',
                 'icon' => 'show.gif',
             ],
@@ -131,14 +123,12 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
     // Fields
     'fields' => [
         'name' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['name'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'alias' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['alias'],
             'exclude' => true,
             'search' => true,
             'flag' => 1,
@@ -150,7 +140,6 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'sql' => "varbinary(128) NOT NULL default ''",
         ],
         'pages' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['pages'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -160,7 +149,6 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'sql' => 'blob NULL',
         ],
         'target' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['target'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -170,14 +158,12 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'sql' => 'blob NULL',
         ],
         'singleSRC' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_content']['singleSRC'],
             'exclude' => true,
             'inputType' => 'fileTree',
             'eval' => ['mandatory' => true, 'filesOnly' => true, 'fieldType' => 'radio', 'extensions' => 'jpg,jpeg,png,gif'],
             'sql' => 'binary(16) NULL',
         ],
         'forceUpdate' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['forceUpdate'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -187,7 +173,6 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'sql' => "char(1) NOT NULL default ''",
         ],
         'crop' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['crop'],
             'exclude' => true,
             'inputType' => 'select',
             'options' => &$GLOBALS['TL_CROP'],
@@ -195,23 +180,19 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'eval' => ['helpwizard' => true, 'tl_class' => 'w50'],
             'sql' => "varchar(64) NOT NULL default ''",
         ],
-
         'addWebapp' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['addWebapp'],
             'exclude' => true,
             'inputType' => 'checkbox',
             'eval' => ['submitOnChange' => true, 'tl_class' => 'clr'],
             'sql' => "char(1) NOT NULL default ''",
         ],
         'webappName' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['webappName'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'webappShortName' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['webappShortName'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['maxlength' => 255, 'tl_class' => 'w50'],
@@ -225,7 +206,6 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'sql' => 'mediumtext NULL',
         ],
         'webappDisplay' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['webappDisplay'],
             'exclude' => true,
             'inputType' => 'select',
             'options_callback' => [Helper::class, 'getWebAppManifestDisplayOptions'],
@@ -234,7 +214,6 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'sql' => "varchar(64) NOT NULL default ''",
         ],
         'webappOrientation' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['webappOrientation'],
             'exclude' => true,
             'inputType' => 'select',
             'options_callback' => [Helper::class, 'getWebAppManifestOrientationOptions'],
@@ -243,29 +222,24 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'sql' => "varchar(64) NOT NULL default ''",
         ],
         'webappThemeColor' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['webappThemeColor'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['maxlength' => 6, 'multiple' => true, 'size' => 2, 'colorpicker' => true, 'isHexColor' => true, 'decodeEntities' => true, 'tl_class' => 'clr w50 wizard'],
             'sql' => "varchar(64) NOT NULL default ''",
         ],
         'webappBackgroundColor' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['webappBackgroundColor'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['maxlength' => 6, 'multiple' => true, 'size' => 2, 'colorpicker' => true, 'isHexColor' => true, 'decodeEntities' => true, 'tl_class' => 'w50 wizard'],
             'sql' => "varchar(64) NOT NULL default ''",
         ],
-
         'addWindowstiles' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['addWindowstiles'],
             'exclude' => true,
             'inputType' => 'checkbox',
             'eval' => ['submitOnChange' => true, 'tl_class' => 'clr'],
             'sql' => "char(1) NOT NULL default ''",
         ],
         'windowsTitle' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['windowsTitle'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
@@ -279,7 +253,6 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'windowsDns' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['windowsDns'],
             'exclude' => true,
             'inputType' => 'text',
             'search' => true,
@@ -287,62 +260,52 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'addWindowsrss' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['addWindowsrss'],
             'exclude' => true,
             'inputType' => 'checkbox',
             'eval' => ['submitOnChange' => true, 'tl_class' => 'clr'],
             'sql' => "char(1) NOT NULL default ''",
         ],
         'windowsRss' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['windowsRss'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'url', 'decodeEntities' => true, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'windowsRssFrequency' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['windowsRssFrequency'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'digit', 'decodeEntities' => true, 'tl_class' => 'w50'],
             'sql' => "int(10) NOT NULL default '30'",
         ],
         'windowsTileColor' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['windowsTileColor'],
             'inputType' => 'text',
             'eval' => ['maxlength' => 6, 'multiple' => true, 'size' => 2, 'colorpicker' => true, 'isHexColor' => true, 'decodeEntities' => true, 'tl_class' => 'w50 wizard'],
             'sql' => "varchar(64) NOT NULL default ''",
         ],
         'windowsTooltipColor' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['windowsTooltipColor'],
             'inputType' => 'text',
             'eval' => ['maxlength' => 6, 'multiple' => true, 'size' => 2, 'colorpicker' => true, 'isHexColor' => true, 'decodeEntities' => true, 'tl_class' => 'w50 wizard'],
             'sql' => "varchar(64) NOT NULL default ''",
         ],
         'windowsSize' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['windowsSize'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['multiple' => true, 'size' => 2, 'rgxp' => 'digit', 'nospace' => true, 'tl_class' => 'w50 wizard'],
             'sql' => "varchar(64) NOT NULL default ''",
         ],
-
         'addIos' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['addIos'],
             'exclude' => true,
             'inputType' => 'checkbox',
             'eval' => ['submitOnChange' => true, 'tl_class' => 'clr'],
             'sql' => "char(1) NOT NULL default ''",
         ],
         'iosTitle' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['iosTitle'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'iosApp' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['iosApp'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -352,7 +315,6 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'sql' => "char(1) NOT NULL default ''",
         ],
         'iosStatusBarStyle' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['iosStatusBarStyle'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -363,16 +325,13 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'eval' => ['tl_class' => 'w50'],
             'sql' => "varchar(32) NOT NULL default ''",
         ],
-
         'addAndroid' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['addAndroid'],
             'exclude' => true,
             'inputType' => 'checkbox',
             'eval' => ['submitOnChange' => true, 'tl_class' => 'clr'],
             'sql' => "char(1) NOT NULL default ''",
         ],
         'androidApp' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['androidApp'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -381,37 +340,31 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'eval' => ['doNotCopy' => true, 'tl_class' => 'w50 m12'],
             'sql' => "char(1) NOT NULL default ''",
         ],
-
         'preview' => [
             'input_field_callback' => [Helper::class, 'previewIcons'],
             'eval' => ['doNotShow' => true],
         ],
         'published' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['published'],
+            'toggle' => true,
             'exclude' => true,
-            'search' => true,
-            'sorting' => true,
-            'flag' => 1,
+            'filter' => true,
             'inputType' => 'checkbox',
-            'eval' => ['doNotCopy' => true],
-            'sql' => "char(1) NOT NULL default ''",
+            'sql' => "char(1) NOT NULL default '1'",
         ],
         'start' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['start'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
             'sql' => "varchar(10) NOT NULL default ''",
         ],
         'stop' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tiles']['stop'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
             'sql' => "varchar(10) NOT NULL default ''",
         ],
         'id' => [
-            'label' => ['ID'],
+            'search' => true,
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
         'tstamp' => [
@@ -419,7 +372,18 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'sorting' => [
+            'sorting' => true,
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
     ],
 ];
+
+/*
+if (method_exists(DC_Table::class, 'toggle')) {
+    $GLOBALS['TL_DCA']['tl_constants']['list']['operations']['toggle'] = [
+        'href' => 'act=toggle&amp;field=published',
+        'icon' => 'visible.svg',
+        'showInHeader' => true,
+    ];
+}
+*/
