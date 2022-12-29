@@ -139,17 +139,25 @@ class Tiles extends Frontend
                     $arrSizesValue['filename'] = $value['filename'];
                 }
                 $strFilename = self::getFilename(
-                    $strDestinationPath, $value['filename'], $arrSizesValue['filename'], $value['extension'],
+                    $strDestinationPath,
+                    $value['filename'],
+                    $arrSizesValue['filename'],
+                    $value['extension'],
                     $objData->alias,
                     $arrSettings['system']['junction'],
-                    (string) $arrSizesValue['width'], (string) $arrSizesValue['height']
+                    (string) $arrSizesValue['width'],
+                    (string) $arrSizesValue['height']
                 );
 
                 $strTitle = self::getFilename(
-                    '', $value['filename'], $arrSizesValue['filename'], $value['extension'],
+                    '',
+                    $value['filename'],
+                    $arrSizesValue['filename'],
+                    $value['extension'],
                     $objData->alias,
                     $arrSettings['system']['junction'],
-                    (string) $arrSizesValue['width'], (string) $arrSizesValue['height']
+                    (string) $arrSizesValue['width'],
+                    (string) $arrSizesValue['height']
                 );
 
                 if (is_file($rootDir.'/'.$strFilename)) {
