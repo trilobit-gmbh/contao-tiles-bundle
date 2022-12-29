@@ -378,12 +378,10 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
     ],
 ];
 
-/*
 if (method_exists(DC_Table::class, 'toggle')) {
-    $GLOBALS['TL_DCA']['tl_constants']['list']['operations']['toggle'] = [
+    $GLOBALS['TL_DCA']['tl_tiles']['list']['operations']['toggle'] = [
         'href' => 'act=toggle&amp;field=published',
         'icon' => 'visible.svg',
         'showInHeader' => true,
     ];
 }
-*/
