@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright  trilobit GmbH
  * @author     trilobit GmbH <https://github.com/trilobit-gmbh>
  * @license    LGPL-3.0-or-later
- * @link       http://github.com/trilobit-gmbh/contao-tiles-bundle
  */
 
 namespace Trilobit\TilesBundle;
 
 use Contao\Controller;
+use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\Database;
-use Contao\Environment;
+use Contao\File;
 use Contao\FilesModel;
 use Contao\Frontend;
 use Contao\LayoutModel;
@@ -28,6 +30,11 @@ class Tiles extends Frontend
 {
     public function generatePageHook(PageModel $objPage, LayoutModel $objLayout, PageRegular $objPageRegular)
     {
+        $strFiles = System::getContainer()
+            ->get('contao.assets.files_context')
+            ->getStaticUrl()
+        ;
+
         global $objPage;
 
         $arrTiles = [];
@@ -37,7 +44,8 @@ class Tiles extends Frontend
 
         $objElements = Database::getInstance()
             ->prepare('SELECT * FROM tl_tiles WHERE '.$strQuery.'ORDER by sorting ASC')
-            ->execute();
+            ->execute()
+        ;
 
         if (null === $objElements) {
             return;
@@ -46,8 +54,7 @@ class Tiles extends Frontend
         //$arrSettings = Helper::getConfigData();
         $arrData = [];
 
-        //$static = (TL_FILES_URL !== '' ? TL_FILES_URL : Environment::get('url').'/');
-        $static = (TL_FILES_URL !== '' ? TL_FILES_URL : '/');
+        $static = ('' !== $strFiles ? $strFiles : '/');
 
         while ($objElements->next()) {
             $intLastUpdate = $objElements->tstamp;
@@ -78,10 +85,9 @@ class Tiles extends Frontend
     }
 
     /**
-     * @param array $arrData
      * @param mixed $intLastUpdate
      */
-    public function processData($arrData = [], $intLastUpdate = '')
+    public function processData(array $arrData = [], $intLastUpdate = '')
     {
         $arrSettings = Helper::getConfigData();
         $arrSettings['system']['lastupdate'] = $intLastUpdate;
@@ -100,12 +106,15 @@ class Tiles extends Frontend
      */
     public static function previewIcons($objData = null)
     {
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+
         $objImage = FilesModel::findByUuid($objData->singleSRC);
         $objTarget = FilesModel::findByPk($objData->target);
 
         if (null === $objImage || null === $objTarget) {
             return '';
         }
+
         $strSourceFile = $objImage->path;
         $strDestinationPath = $objTarget->path;
 
@@ -130,20 +139,28 @@ class Tiles extends Frontend
                     $arrSizesValue['filename'] = $value['filename'];
                 }
                 $strFilename = self::getFilename(
-                    $strDestinationPath, $value['filename'], $arrSizesValue['filename'], $value['extension'],
+                    $strDestinationPath,
+                    $value['filename'],
+                    $arrSizesValue['filename'],
+                    $value['extension'],
                     $objData->alias,
                     $arrSettings['system']['junction'],
-                    $arrSizesValue['width'], $arrSizesValue['height']
+                    (string) $arrSizesValue['width'],
+                    (string) $arrSizesValue['height']
                 );
 
                 $strTitle = self::getFilename(
-                    '', $value['filename'], $arrSizesValue['filename'], $value['extension'],
+                    '',
+                    $value['filename'],
+                    $arrSizesValue['filename'],
+                    $value['extension'],
                     $objData->alias,
                     $arrSettings['system']['junction'],
-                    $arrSizesValue['width'], $arrSizesValue['height']
+                    (string) $arrSizesValue['width'],
+                    (string) $arrSizesValue['height']
                 );
 
-                if (is_file(TL_ROOT.'/'.$strFilename)) {
+                if (is_file($rootDir.'/'.$strFilename)) {
                     $strReturn .= '<div class="widget preview">'
                         .'<div class="image-container">'
                         .'<span>'
@@ -186,14 +203,17 @@ class Tiles extends Frontend
      */
     public static function generateTiles($objData = null)
     {
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+
         $objImage = FilesModel::findByUuid($objData->singleSRC);
         $objTarget = FilesModel::findByPk($objData->target);
 
         if (null === $objImage || null === $objTarget) {
             return;
         }
-        $strSourceFile = TL_ROOT.'/'.$objImage->path;
-        $strDestinationPath = TL_ROOT.'/'.$objTarget->path;
+
+        $strSourceFile = $rootDir.'/'.$objImage->path;
+        $strDestinationPath = $rootDir.'/'.$objTarget->path;
 
         $arrSettings = Helper::getConfigData();
         //$arrData = self::prepareData($objData);
@@ -206,15 +226,27 @@ class Tiles extends Frontend
                 if (!isset($arrSizesValue['filename'])) {
                     $arrSizesValue['filename'] = $value['filename'];
                 }
+
                 $strFilename = self::getFilename(
                     $strDestinationPath, $value['filename'], $arrSizesValue['filename'], $value['extension'],
                     $objData->alias,
                     $arrSettings['system']['junction'],
-                    $arrSizesValue['width'], $arrSizesValue['height']
+                    (string) $arrSizesValue['width'], (string) $arrSizesValue['height']
                 );
 
-                System::getContainer()
-                    ->get('contao.image.image_factory')
+                $version = (method_exists(ContaoCoreBundle::class, 'getVersion') ? ContaoCoreBundle::getVersion() : VERSION);
+
+                if (version_compare($version, '4.9', '>')) {
+                    $imageFactory = System::getContainer()
+                        ->get('contao.image.factory')
+                    ;
+                } else {
+                    $imageFactory = System::getContainer()
+                        ->get('contao.image.image_factory')
+                    ;
+                }
+
+                $imageFactory
                     ->create(
                         $strSourceFile,
                         [
@@ -224,7 +256,8 @@ class Tiles extends Frontend
                         ],
                         $strFilename
                     )
-                    ->getUrl(TL_ROOT);
+                    ->getUrl($rootDir)
+                ;
             }
         }
 
@@ -266,7 +299,7 @@ class Tiles extends Frontend
         $strFaviconSourceForIcoFilename = str_replace('##junction##', $arrSettings['system']['junction'], $strFaviconSourceForIcoFilename);
 
         self::createIcoFile(
-            TL_ROOT.'/'.$strFaviconSourceForIcoFilename,
+            $rootDir.'/'.$strFaviconSourceForIcoFilename,
             $objTarget->path.'/'.$arrSettings['favicon']['filename'].'.'.$arrSettings['favicon']['extension'],
             $arrSettings['favicon']['sizes']
         );
@@ -274,14 +307,11 @@ class Tiles extends Frontend
         Database::getInstance()
             ->prepare('UPDATE tl_tiles SET forceUpdate=? WHERE id=?')
             ->limit(1)
-            ->execute('', $objData->id);
+            ->execute('', $objData->id)
+        ;
     }
 
-    /**
-     * @param array $arrData
-     * @param array $arrSettings
-     */
-    protected function processImageData($arrData = [], $arrSettings = [])
+    protected function processImageData(array $arrData = [], array $arrSettings = [])
     {
         if (!\is_array($arrSettings['images'])) {
             return;
@@ -313,11 +343,11 @@ class Tiles extends Frontend
 
                 $strHeader = str_replace('##extension##', $value['extension'], $strHeader);
 
-                $strHeader = str_replace('##filename##', isset($arrSizesValue['filename']) ? $arrSizesValue['filename'] : $value['filename'], $strHeader);
-                $strHeader = str_replace('##name##', isset($arrSizesValue['name']) ? $arrSizesValue['name'] : '', $strHeader);
-                $strHeader = str_replace('##width##', isset($arrSizesValue['width']) ? $arrSizesValue['width'] : '', $strHeader);
-                $strHeader = str_replace('##height##', isset($arrSizesValue['height']) ? $arrSizesValue['height'] : '', $strHeader);
-                $strHeader = str_replace('##lastupdate##', isset($arrSettings['system']['lastupdate']) ? $arrSettings['system']['lastupdate'] : '', $strHeader);
+                $strHeader = str_replace('##filename##', (string) (isset($arrSizesValue['filename']) ? $arrSizesValue['filename'] : $value['filename']), $strHeader);
+                $strHeader = str_replace('##name##', (string) (isset($arrSizesValue['name']) ? $arrSizesValue['name'] : ''), $strHeader);
+                $strHeader = str_replace('##width##', (string) (isset($arrSizesValue['width']) ? $arrSizesValue['width'] : ''), $strHeader);
+                $strHeader = str_replace('##height##', (string) (isset($arrSizesValue['height']) ? $arrSizesValue['height'] : ''), $strHeader);
+                $strHeader = str_replace('##lastupdate##', (string) (isset($arrSettings['system']['lastupdate']) ? $arrSettings['system']['lastupdate'] : ''), $strHeader);
 
                 $strHeader = preg_replace('/="\/http/', '="http', $strHeader);
 
@@ -327,11 +357,7 @@ class Tiles extends Frontend
         }
     }
 
-    /**
-     * @param array $arrData
-     * @param array $arrSettings
-     */
-    protected function processAdditionalData($arrData = [], $arrSettings = [])
+    protected function processAdditionalData(array $arrData = [], array $arrSettings = [])
     {
         if (!\is_array($arrSettings['additionals'])) {
             return;
@@ -361,11 +387,7 @@ class Tiles extends Frontend
         }
     }
 
-    /**
-     * @param array $arrData
-     * @param array $arrSettings
-     */
-    protected function processFaviconData($arrData = [], $arrSettings = [])
+    protected function processFaviconData(array $arrData = [], array $arrSettings = [])
     {
         if (!\is_array($arrSettings['favicon']['attributes']['integration'])) {
             return;
@@ -392,10 +414,10 @@ class Tiles extends Frontend
                 $strHeader = str_replace('##'.$dKey.'##', $dValue, $strHeader);
             }
 
-            $strHeader = str_replace('##extension##', isset($arrSettings['favicon']['extension']) ? $arrSettings['favicon']['extension'] : '', $strHeader);
-            $strHeader = str_replace('##filename##', isset($arrSettings['favicon']['filename']) ? $arrSettings['favicon']['filename'] : '', $strHeader);
-            $strHeader = str_replace('##name##', isset($arrSettings['favicon']['name']) ? $arrSettings['favicon']['name'] : '', $strHeader);
-            $strHeader = str_replace('##lastupdate##', isset($arrSettings['system']['lastupdate']) ? $arrSettings['system']['lastupdate'] : '', $strHeader);
+            $strHeader = str_replace('##extension##', (string) (isset($arrSettings['favicon']['extension']) ? $arrSettings['favicon']['extension'] : ''), $strHeader);
+            $strHeader = str_replace('##filename##', (string) (isset($arrSettings['favicon']['filename']) ? $arrSettings['favicon']['filename'] : ''), $strHeader);
+            $strHeader = str_replace('##name##', (string) (isset($arrSettings['favicon']['name']) ? $arrSettings['favicon']['name'] : ''), $strHeader);
+            $strHeader = str_replace('##lastupdate##', (string) (isset($arrSettings['system']['lastupdate']) ? $arrSettings['system']['lastupdate'] : ''), $strHeader);
 
             self::addToHeader($strHeader);
         }
@@ -502,24 +524,20 @@ class Tiles extends Frontend
      */
     protected function addToHeader($strData)
     {
-        $GLOBALS['TL_HEAD'][] = Controller::replaceInsertTags($strData);
+        $version = (method_exists(ContaoCoreBundle::class, 'getVersion') ? ContaoCoreBundle::getVersion() : VERSION);
+
+        if (version_compare($version, '5.0', '>=')) {
+            $GLOBALS['TL_HEAD'][] = System::getContainer()->get('contao.insert_tag.parser')->replace($strData);
+        } else {
+            $GLOBALS['TL_HEAD'][] = Controller::replaceInsertTags($strData);
+        }
     }
 
     /**
-     * @param string $strPath
-     * @param string $strFilenameA
-     * @param string $strFilenameB
-     * @param string $strExtension
-     * @param string $strAlias
-     * @param string $strJunction
-     * @param string $strWidth
-     * @param string $strHeight
-     *
      * @return mixed|string
      */
-    protected static function getFilename($strPath = '', $strFilenameA = '', $strFilenameB = '', $strExtension = '', $strAlias = '', $strJunction = '', $strWidth = '', $strHeight = '')
+    protected static function getFilename(string $strPath = '', string $strFilenameA = '', string $strFilenameB = '', string $strExtension = '', string $strAlias = '', string $strJunction = '', string $strWidth = '', string $strHeight = '')
     {
-        //$strData = TL_FILES_URL.$strPath
         $strData = $strPath
             .'/'
             .(isset($strFilenameB) ? $strFilenameB : $strFilenameA)
@@ -529,9 +547,8 @@ class Tiles extends Frontend
         $strData = str_replace('##width##', $strWidth, $strData);
         $strData = str_replace('##height##', $strHeight, $strData);
         $strData = str_replace('##alias##', $strAlias, $strData);
-        $strData = str_replace('##junction##', $strJunction, $strData);
 
-        return $strData;
+        return str_replace('##junction##', $strJunction, $strData);
     }
 
     /**
@@ -546,9 +563,7 @@ class Tiles extends Frontend
             $strData = str_replace('##'.$key.'##', $value, $strData);
         }
 
-        $strData = Controller::replaceInsertTags($strData);
-
-        return $strData;
+        return Controller::replaceInsertTags($strData);
     }
 
     /**
@@ -561,7 +576,7 @@ class Tiles extends Frontend
     protected static function createIcoFile($strSourceFile, $strTargetFile, $arrFaviconSizes)
     {
         $objIconFile = new PHP_ICO($strSourceFile, $arrFaviconSizes);
-        $objFile = new \File($strTargetFile);
+        $objFile = new File($strTargetFile);
         $objFile->write($objIconFile->_get_ico_data());
         $objFile->close();
     }

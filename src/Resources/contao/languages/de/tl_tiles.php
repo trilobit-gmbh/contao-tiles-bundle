@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright  trilobit GmbH
  * @author     trilobit GmbH <https://github.com/trilobit-gmbh>
  * @license    LGPL-3.0-or-later
- * @link       http://github.com/trilobit-gmbh/contao-tiles-bundle
  */
 
 $GLOBALS['TL_LANG']['tl_tiles']['new'][0] = 'Neue Kategorie';
@@ -43,6 +44,8 @@ $GLOBALS['TL_LANG']['tl_tiles']['pages'][0] = 'Elternseite auswählen';
 $GLOBALS['TL_LANG']['tl_tiles']['pages'][1] = 'Wählen Sie die Elternseite aus, auf denen die Einstellungen übernommen werden sollen.';
 $GLOBALS['TL_LANG']['tl_tiles']['target'][0] = 'Zielverzeichnis auswählen';
 $GLOBALS['TL_LANG']['tl_tiles']['target'][1] = 'Wählen Sie das Zielverzeichnis aus, in das die Icons gespeichert werden sollen.';
+$GLOBALS['TL_LANG']['tl_tiles']['singleSRC'][0] = 'Quelldatei';
+$GLOBALS['TL_LANG']['tl_tiles']['singleSRC'][1] = 'Bitte wählen Sie eine Datei aus der Dateiübersicht.';
 $GLOBALS['TL_LANG']['tl_tiles']['windowsTitle'][0] = 'Titel';
 $GLOBALS['TL_LANG']['tl_tiles']['windowsTitle'][1] = 'Text, der Benutzern auf Ihrer Windows 8.1-Kachel angezeigt wird.';
 $GLOBALS['TL_LANG']['tl_tiles']['windowsTooltip'][0] = 'Tooltip';
