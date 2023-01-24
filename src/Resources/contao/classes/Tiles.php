@@ -563,6 +563,12 @@ class Tiles extends Frontend
             $strData = str_replace('##'.$key.'##', $value, $strData);
         }
 
+        $version = (method_exists(ContaoCoreBundle::class, 'getVersion') ? ContaoCoreBundle::getVersion() : VERSION);
+
+        if (version_compare($version, '5.0', '>=')) {
+            return System::getContainer()->get('contao.insert_tag.parser')->replace($strData);
+        }
+
         return Controller::replaceInsertTags($strData);
     }
 
