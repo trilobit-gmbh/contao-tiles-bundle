@@ -471,7 +471,7 @@ class Tiles extends Frontend
                     $arrWindows,
                     [
                         'windowsRss' => $objData->windowsRss,
-                        'windowsRssFrequency' => $strWindowsRssFrequency,
+                        'windowsRssFrequency' => (string) $strWindowsRssFrequency,
                     ]
                 );
             }
