@@ -36,7 +36,7 @@ class Helper
     {
         $strYml = file_get_contents(self::getVendowDir().'/../config/config.yml');
 
-        return Yaml::parse($strYml)['trilobit']['tiles'];
+        return Yaml::parse($strYml)['trilobit_tiles']['tiles'];
     }
 
     public function generateTiles(DataContainer $dc)
