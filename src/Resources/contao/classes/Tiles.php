@@ -134,7 +134,7 @@ class Tiles extends Frontend
                 .'</div>'
             ;
 
-            foreach ($value['sizes'] as $strSizesKey => $arrSizesValue) {
+            foreach ($value['sizes'] as $arrSizesValue) {
                 if (!isset($arrSizesValue['filename'])) {
                     $arrSizesValue['filename'] = $value['filename'];
                 }
@@ -221,8 +221,8 @@ class Tiles extends Frontend
         $arrJson = [];
 
         // generate tiles
-        foreach ($arrSettings['images'] as $strGroupKey => $value) {
-            foreach ($value['sizes'] as $strSizesKey => $arrSizesValue) {
+        foreach ($arrSettings['images'] as $value) {
+            foreach ($value['sizes'] as $arrSizesValue) {
                 if (!isset($arrSizesValue['filename'])) {
                     $arrSizesValue['filename'] = $value['filename'];
                 }
@@ -319,7 +319,7 @@ class Tiles extends Frontend
         foreach ($arrSettings['images'] as $key => $value) {
             self::addToHeader('<!-- images::'.$key.' -->');
 
-            foreach ($value['sizes'] as $strSizesKey => $arrSizesValue) {
+            foreach ($value['sizes'] as $arrSizesValue) {
                 $strHeader = '<'.$value['tag'];
 
                 foreach ($value['attributes'] as $aKey => $aValue) {
