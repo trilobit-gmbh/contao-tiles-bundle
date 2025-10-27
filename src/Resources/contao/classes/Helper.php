@@ -13,7 +13,6 @@ namespace Trilobit\TilesBundle;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\System;
-use Exception;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -29,9 +28,6 @@ class Helper
         return \dirname(__DIR__);
     }
 
-    /**
-     * @return mixed
-     */
     public static function getConfigData()
     {
         $strYml = file_get_contents(self::getVendowDir().'/../config/config.yml');
@@ -61,14 +57,11 @@ class Helper
 
         return '<div class="tl_box"><div id="tiles_images">'
             .Tiles::previewIcons($dc->activeRecord)
-            .'</div></div>'
-            ;
+            .'</div></div>';
     }
 
     /**
-     * @param $varValue
-     *
-     * @throws Exception
+     * @throws \Exception
      *
      * @return mixed|string
      */
@@ -78,7 +71,8 @@ class Helper
             return Database::getInstance()
                     ->prepare('SELECT id FROM tl_tiles WHERE alias=?')
                     ->execute($value)
-                    ->numRows > 0;
+                    ->numRows > 0
+            ;
         };
 
         if ($varValue) {
@@ -92,9 +86,9 @@ class Helper
                 ->generate($dc->activeRecord->name, 0, $aliasExists)
             ;
         } elseif (preg_match('/^[1-9]\d*$/', $varValue)) {
-            throw new \Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
+            throw new \Exception(\sprintf($GLOBALS['TL_LANG']['ERR']['aliasNumeric'], $varValue));
         } elseif ($aliasExists($varValue)) {
-            throw new \Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
+            throw new \Exception(\sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
         }
 
         return $varValue;

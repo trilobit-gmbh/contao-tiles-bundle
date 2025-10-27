@@ -22,10 +22,10 @@ $GLOBALS['BE_MOD']['trilobit']['tiles'] = [
 /*
  * Add css
  */
-$request = \Contao\System::getContainer()
+$request = Contao\System::getContainer()
     ->get('request_stack')
     ->getCurrentRequest()
 ;
-if ($request && \Contao\System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request)) {
+if ($request && Contao\System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request)) {
     $GLOBALS['TL_CSS'][] = 'bundles/trilobittiles/css/backend.css';
 }
