@@ -21,13 +21,19 @@ use Contao\PageModel;
 use Contao\PageRegular;
 use Contao\StringUtil;
 use Contao\System;
-use PHP_ICO;
 
 /**
  * Class Tiles.
  */
 class Tiles extends Frontend
 {
+
+    public function __construct()
+    {
+        $this->insertTagParser = System::getContainer()->get('contao.insert_tag.parser');
+        $this->rootDir = System::getContainer()->getParameter('kernel.project_dir');
+    }
+
     public function generatePageHook(PageModel $objPage, LayoutModel $objLayout, PageRegular $objPageRegular)
     {
         $strFiles = System::getContainer()
@@ -51,7 +57,7 @@ class Tiles extends Frontend
             return;
         }
 
-        //$arrSettings = Helper::getConfigData();
+        // $arrSettings = Helper::getConfigData();
         $arrData = [];
 
         $static = ('' !== $strFiles ? $strFiles : '/');
@@ -84,10 +90,7 @@ class Tiles extends Frontend
         }
     }
 
-    /**
-     * @param mixed $intLastUpdate
-     */
-    public function processData(array $arrData = [], $intLastUpdate = '')
+    public function processData(array $arrData = [], mixed $intLastUpdate = '')
     {
         $arrSettings = Helper::getConfigData();
         $arrSettings['system']['lastupdate'] = $intLastUpdate;
@@ -131,10 +134,9 @@ class Tiles extends Frontend
                 .'<h3><label>'
                 .(isset($GLOBALS['TL_LANG']['tl_tiles']['template'][$strGroupKey]) ? $GLOBALS['TL_LANG']['tl_tiles']['template'][$strGroupKey] : '__'.$strGroupKey.'__')
                 .'</label></h3>'
-                .'</div>'
-            ;
+                .'</div>';
 
-            foreach ($value['sizes'] as $strSizesKey => $arrSizesValue) {
+            foreach ($value['sizes'] as $arrSizesValue) {
                 if (!isset($arrSizesValue['filename'])) {
                     $arrSizesValue['filename'] = $value['filename'];
                 }
@@ -187,8 +189,7 @@ class Tiles extends Frontend
                         .'</tbody>'
                         .'</table>'
 
-                        .'</div>'
-                    ;
+                        .'</div>';
                 }
             }
         }
@@ -216,13 +217,13 @@ class Tiles extends Frontend
         $strDestinationPath = $rootDir.'/'.$objTarget->path;
 
         $arrSettings = Helper::getConfigData();
-        //$arrData = self::prepareData($objData);
+        // $arrData = self::prepareData($objData);
 
         $arrJson = [];
 
         // generate tiles
-        foreach ($arrSettings['images'] as $strGroupKey => $value) {
-            foreach ($value['sizes'] as $strSizesKey => $arrSizesValue) {
+        foreach ($arrSettings['images'] as $value) {
+            foreach ($value['sizes'] as $arrSizesValue) {
                 if (!isset($arrSizesValue['filename'])) {
                     $arrSizesValue['filename'] = $value['filename'];
                 }
@@ -319,7 +320,7 @@ class Tiles extends Frontend
         foreach ($arrSettings['images'] as $key => $value) {
             self::addToHeader('<!-- images::'.$key.' -->');
 
-            foreach ($value['sizes'] as $strSizesKey => $arrSizesValue) {
+            foreach ($value['sizes'] as $arrSizesValue) {
                 $strHeader = '<'.$value['tag'];
 
                 foreach ($value['attributes'] as $aKey => $aValue) {
@@ -424,8 +425,6 @@ class Tiles extends Frontend
     }
 
     /**
-     * @param $objData
-     *
      * @return array
      */
     protected static function prepareData($objData)
@@ -481,7 +480,7 @@ class Tiles extends Frontend
             $arrWebapp = [
                 'webappName' => $objData->webappName,
                 'webappShortName' => $objData->webappShortName,
-                //'webappDescription' => $objData->webappDescription,
+                // 'webappDescription' => $objData->webappDescription,
                 'webappDisplay' => $objData->webappDisplay,
                 'webappOrientation' => $objData->webappOrientation,
                 'webappThemeColor' => $strWebappThemeColor,
@@ -519,9 +518,6 @@ class Tiles extends Frontend
         );
     }
 
-    /**
-     * @param $strData
-     */
     protected function addToHeader($strData)
     {
         $version = (method_exists(ContaoCoreBundle::class, 'getVersion') ? ContaoCoreBundle::getVersion() : VERSION);
@@ -529,7 +525,7 @@ class Tiles extends Frontend
         if (version_compare($version, '5.0', '>=')) {
             $GLOBALS['TL_HEAD'][] = System::getContainer()->get('contao.insert_tag.parser')->replace($strData);
         } else {
-            $GLOBALS['TL_HEAD'][] = Controller::replaceInsertTags($strData);
+            $GLOBALS['TL_HEAD'][] = $this->insertTagParser->replaceInline($strData);
         }
     }
 
@@ -541,8 +537,7 @@ class Tiles extends Frontend
         $strData = $strPath
             .'/'
             .(isset($strFilenameB) ? $strFilenameB : $strFilenameA)
-            .'.'.$strExtension
-        ;
+            .'.'.$strExtension;
 
         $strData = str_replace('##width##', $strWidth, $strData);
         $strData = str_replace('##height##', $strHeight, $strData);
@@ -552,9 +547,6 @@ class Tiles extends Frontend
     }
 
     /**
-     * @param $arrData
-     * @param $strData
-     *
      * @return mixed|string
      */
     protected static function getCurrentData($arrData, $strData)
@@ -569,19 +561,15 @@ class Tiles extends Frontend
             return System::getContainer()->get('contao.insert_tag.parser')->replace($strData);
         }
 
-        return Controller::replaceInsertTags($strData);
+        return $this->insertTagParser->replaceInline($strData);
     }
 
     /**
-     * @param $strSourceFile
-     * @param $strTargetFile
-     * @param $arrFaviconSizes
-     *
      * @throws \Exception
      */
     protected static function createIcoFile($strSourceFile, $strTargetFile, $arrFaviconSizes)
     {
-        $objIconFile = new PHP_ICO($strSourceFile, $arrFaviconSizes);
+        $objIconFile = new \PHP_ICO($strSourceFile, $arrFaviconSizes);
         $objFile = new File($strTargetFile);
         $objFile->write($objIconFile->_get_ico_data());
         $objFile->close();

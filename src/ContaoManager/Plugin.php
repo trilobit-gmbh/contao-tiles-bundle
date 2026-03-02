@@ -23,9 +23,6 @@ use Trilobit\TilesBundle\TrilobitTilesBundle;
  */
 class Plugin implements BundlePluginInterface
 {
-    /**
-     * {@inheritDoc}
-     */
     public function getBundles(ParserInterface $parser)
     {
         return [

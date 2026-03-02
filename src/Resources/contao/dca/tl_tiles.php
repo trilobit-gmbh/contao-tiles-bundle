@@ -106,7 +106,7 @@ $GLOBALS['TL_DCA']['tl_tiles'] = [
                    .'{windows_legend:hide},addWindowstiles;'
                    .'{ios_legend:hide},addIos;'
                    .'{android_legend:hide},addAndroid;'
-                   .'{favicon_legend:hide},singleSRC,crop,forceUpdate;'
+                   .'{favicon_legend:hide},singleSRC,forceUpdate;'
                    .'{preview_legend:hide},preview;'
                    .'{publish_legend:hide},published,start,stop',
     ],
